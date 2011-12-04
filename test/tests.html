@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <title>Traversty Tests</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="../node_modules/sink-test/src/sink.css" type="text/css">
+    <style type="text/css">
+      #fixtures {
+        position: absolute;
+        top: -9999em;
+        width: 1000px; /*for ie<=7*/
+      }
+    </style>
+    <script src="../node_modules/sink-test/src/sink.js"></script>
+    <script src="../node_modules/qwery/qwery.js"></script>
+    <script type="text/javascript">
+      function traversty() {
+        return 'success'
+      }
+    </script>
+    <script src="../src/traversty.js"></script>
+    <script type="text/javascript">
+      var T = traversty.noConflict()
+      var Q = qwery.noConflict()
+      T.setSelectorEngine(Q)
+    </script>
+  </head>
+  <body>
+    <div id="fixtures">
+    </div>
+    <h1>Traversty Tests</h1>
+    <ol id="tests"></ol>
+
+    <script>
+      sink('Traversty', function(test, ok, before, after) {
+
+        test('traversty.noConflict()', 2, function() {
+
+          ok(traversty() === 'success', 'traversty() is original function')
+
+          ok(typeof T().up === 'function', 'T() is traversty')
+
+        })
+
+        test('traversty() can be passed nodes', 4, function() {
+          var el, t
+
+          ok((t = T(el = document.body)).length === 1 && t[0] === el
+            , 'T(body) has body (only)')
+
+          ok((t = T(el = Q('#fixtures')[0])).length === 1 && t[0] === el
+            , 'T(#fixtures) has #fixtures element (only)')
+
+          ok((t = T([el = Q('#fixtures')[0]])).length === 1 && t[0] === el
+            , 'T([#fixtures]) has #fixtures element (only)')
+ 
+
+          ok((t = T([el = Q('#fixtures')[0], document.body])).length === 2 && t[0] === el && t[1] === document.body
+            , 'T([#fixtures, body]) has #fixtures element and body')
+ 
+        })
+
+
+        test('traversty() can be passed selector strings', 2, function() {
+          var el, t
+
+          ok((t = T('#fixtures')).length === 1 && t[0] === Q('#fixtures')[0]
+            , 'T("#fixtures") has #fixtures element (only)')
+
+          ok((t = T('#fixtures,h1,ol#tests')).length === 3 && t[0] === Q('#fixtures')[0] && t[1] === Q('h1')[0] && t[2] === Q('ol#tests')[0]
+            , 'T("#fixtures,h1,ol#tests") has all expected 3 elements (only)')
+
+        })
+
+
+      })
+      start()
+    </script>
+
+  </body>
+</html>

@@ -1,0 +1,2 @@
+default:
+	node build.js
