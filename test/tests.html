@@ -27,6 +27,40 @@
   </head>
   <body>
     <div id="fixtures">
+      <ul>
+        <li>ONE</li>
+        <li class="c">TWO</li>
+        <li>THREE</li>
+        <li class="c">FOUR
+          <ul>
+            <li>i</li>
+            <li class="c">ii</li>
+            <li>iii</li>
+            <li class="c">iv
+              <span class="c">SPAN</span>
+            </li>
+          </ul>
+        </li>
+        <li class="c">FIVE</li>
+      </ul>
+      <ul>
+        <li>one</li>
+        <li class="c">two</li>
+        <li>three</li>
+        <li class="c">four
+          <ul class="c">
+            <li>1</li>
+            <li class="c">2</li>
+            <li>3</li>
+            <li class="c">4
+              <span class="c">span</span>
+            </li>
+          </ul>
+        </li>
+        <li class="c">five</li>
+      </ul>
+      <div id="flat">
+      </div>
     </div>
     <h1>Traversty Tests</h1>
     <ol id="tests"></ol>
@@ -72,9 +106,175 @@
 
         })
 
+      })
+
+      sink('Simple no-arg traversal', function(test, ok, before, after) {
+
+        test('next()', 1, function() { 
+          var t
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(1)')).next()).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li:nth-child(2)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li:nth-child(2)')[0]
+            , 'next() on two elements moved to nextSibling on both')
+
+        })
+
+        test('previous()', 1, function() { 
+          var t
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(4)')).previous()).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li:nth-child(3)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li:nth-child(3)')[0]
+            , 'previous() on two elements moved to previousSibling on both')
+
+        })
+
+        test('up()', 1, function() { 
+          var t
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(4)')).up()).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2)')[0]
+            , 'up() on two elements moved to parentNode on both')
+
+        })
+
+        test('down()', 1, function() { 
+          var t
+
+          ok((t = T(Q('#fixtures > ul')).down()).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li:nth-child(1)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li:nth-child(1)')[0]
+            , 'down() on two elements moved to first childNode on both')
+
+        })
 
       })
+
+      sink('Index argument traversal', function(test, ok, before, after) {
+
+        test('next(index)', 3, function() { 
+          var t
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(1)')).next(0)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li:nth-child(2)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li:nth-child(2)')[0]
+            , 'next(0) on two elements moved to 1st nextSibling element on both')
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(1)')).next(1)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li:nth-child(3)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li:nth-child(3)')[0]
+            , 'next(1) on two elements moved to 2nd nextSibling element on both')
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(1)')).next(3)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li:nth-child(5)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li:nth-child(5)')[0]
+            , 'next(4) on two elements moved to 5th nextSibling element on both')
+        })
+
+        test('previous(index)', 3, function() { 
+          var t
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(5)')).previous(0)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li:nth-child(4)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li:nth-child(4)')[0]
+            , 'previous(0) on two elements moved to 1st previousSibling element on both')
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(5)')).previous(1)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li:nth-child(3)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li:nth-child(3)')[0]
+            , 'previous(1) on two elements moved to 2nd previousSibling element on both')
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(5)')).previous(3)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li:nth-child(1)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li:nth-child(1)')[0]
+            , 'previous(4) on two elements moved to 5th previousSibling element on both')
+        })
+
+        test('up(index)', 3, function() { 
+          var t
+
+          ok((t = T(Q('#fixtures > ul > li > ul > li > span')).up(0)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li > ul > li:nth-child(4)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li > ul > li:nth-child(4)')[0]
+            , 'up(0) on two elements moved to 1st parentNode on both')
+
+          ok((t = T(Q('#fixtures > ul > li > ul > li > span')).up(3)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2)')[0]
+            , 'up(3) on two elements moved to 3rd parentNode on both')
+
+          ok((t = T(Q('#fixtures > ul > li > ul > li > span')).up(4)).length === 1 &&
+                t[0] === Q('#fixtures')[0]
+            , 'up(4) on two elements moved to single common ancestor node for both')
+
+        })
+
+        test('down(index)', 3, function() { 
+          var t
+
+          ok((t = T(Q('#fixtures > ul')).down(0)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li:nth-child(1)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li:nth-child(1)')[0]
+            , 'down(0) on two elements moved to first childNode on both')
+
+          ok((t = T(Q('#fixtures > ul')).down(1)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li:nth-child(2)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li:nth-child(2)')[0]
+            , 'down(0) on two elements moved to second childNode on both')
+
+          ok((t = T(Q('#fixtures > ul')).down(9)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li > ul > li > span')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li > ul > li > span')[0]
+            , 'down(9) on two elements moved down to 10th descendent in document order')
+
+        })
+
+      })
+
+      sink('Selector and index argument traversal', function(test, ok, before, after) {
+
+        test('next(selector, index)', 3, function() { 
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(1)')).next('li', 1)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li:nth-child(3)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li:nth-child(3)')[0]
+            , 'next("li", 1) moves to 2nd nextSibling')
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(1)')).next('.c', 1)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > .c')[1] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > .c')[1]
+            , 'next(".c", 1) moves to 2nd nextSibling with class "c"')
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(1)')).next('li.c', 2)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li.c')[2] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li.c')[2]
+            , 'next("li.c", 2) moves to 3rd nextSibling li with class "c"')
+        })
+
+        test('previous(selector, index)', 3, function() { 
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(5)')).previous('li', 1)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li:nth-child(3)')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li:nth-child(3)')[0]
+            , 'previous("li", 1) moves to 2nd previousSibling')
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(5)')).previous('.c', 0)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > .c')[1] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > .c')[1]
+            , 'previous(".c", 0) moves to 1st previousSibling with class "c"')
+
+          ok((t = T(Q('#fixtures > ul > li:nth-child(5)')).previous('li.c', 1)).length === 2 &&
+                t[0] === Q('#fixtures > ul:nth-child(1) > li.c')[0] &&
+                t[1] === Q('#fixtures > ul:nth-child(2) > li.c')[0]
+            , 'previous("li.c", 1) moves to 2nd previousSibling li with class "c"')
+        })
+
+      })
+
       start()
+
     </script>
 
   </body>

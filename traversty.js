@@ -13,26 +13,98 @@
     , old = context.traversty
     , win = window
     , doc = win.document
-    , selector = null
+    , selectorEngine = null
+    , toString = Object.prototype.toString
+    , matchesSelector = (function(el, pfx, name, i, ms) {
+        for (; i < pfx.length; i++)
+          if (el[ms = pfx[i] + name]) return ms
+        if (el[name = 'm' + name.substring(1)]) return name
+      })(document.documentElement, [ 'ms', 'webkit', 'moz', 'o' ], 'MatchesSelector', 0)
 
-    , up = function(selector, index) {
-        console.log('up!', this[0])
-        return this
+    , isNumber = function (o) {
+        return toString.call(o) === '[object Number]'
+      }
+
+    , isString = function(o) {
+        return toString.call(o) === '[object String]'
+      }
+
+    , isUndefined = function(o) {
+        return o === void 0
+      }
+
+    , isElement = function(o) {
+        return o && o.nodeType === 1
+      }
+
+    , getIndex = function(selector, index) {
+        return isUndefined(selector) && !isNumber(index) ? 0 :
+          isNumber(selector) ? selector : index
+      }
+
+    , getSelector = function(selector) {
+        return isString(selector) ? selector : '*'
+      }
+
+    , unique = function(ar) {
+        var a = [], i, j
+        label:
+        for (i = 0; i < ar.length; i++) {
+          for (j = 0; j < a.length; j++)
+            if (a[j] === ar[i]) continue label
+          a.push(ar[i])
+        }
+        return a
+      }
+
+    , collect = function (els, fn) {
+        var ret = [], i = 0, l = els.length
+        while (i < l) ret.push(fn(els[i++]))
+        return ret
+      }
+
+   , move = function (els, method, selector, index) {
+        index = getIndex(selector, index)
+        selector = getSelector(selector)
+        return collect(els
+          , function (el) {
+              for (var i = index; el && i >= 0;) {
+                el = el[method]
+                if (isElement(el) && selectorMatches(el, selector)) i--
+              }
+              return el || 0
+            }
+        )
+      }
+
+    , selectorFind = function(el, selector) {
+        return el.querySelectorAll(selector)
+      }
+
+    , selectorMatches = function(el, selector) {
+        return selector === '*' || el[matchesSelector](selector)
       }
 
     , down = function(selector, index) {
-        console.log('down!', this[0])
-        return this
+        index = getIndex(selector, index)
+        selector = getSelector(selector)
+        return traversty(collect(this
+          , function (el) {
+              return selectorFind(el, selector)[index] || 0
+            }
+          ))
       }
 
-    , previous = function(selector, index) {
-        console.log('previous!', this[0])
-        return this
+    , up = function(selector, index) {
+        return traversty(unique(move(this, 'parentNode', selector, index)))
       }
 
-    , next = function(selector, index) {
-        console.log('next!', this[0])
-        return this
+    , previous = function (selector, index) {
+        return traversty(move(this, 'previousSibling', selector, index))
+      }
+
+    , next = function (selector, index) {
+        return traversty(move(this, 'nextSibling', selector, index))
       }
 
     , traversty = (function() {
@@ -48,12 +120,11 @@
         T.prototype = { up: up, down: down, previous: previous, next: next }
 
         function t(els) {
-          return new T(selector && els && typeof els === 'string' ? selector(els) : els)
+          return new T(isString(els) ? selectorFind(doc, els) : els)
         }
 
         t.setSelectorEngine = function (s) {
-          selector = s;
-          delete t.setQueryEngine
+          selectorEngine = s
         }
 
         t.noConflict = function () {

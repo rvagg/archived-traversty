@@ -1,5 +1,18 @@
 !function ($) {
   var t = require('traversty')
-  t.setQueryEngine($)
-  $.ender(t(), true)
+    , integrate = function(meth) {
+        return function(selector, index) {
+          return $(t(this)[meth](selector, index))
+        }
+      }
+  t.setSelectorEngine($)
+  $.ender(
+      {
+          up: integrate('up')
+        , down: integrate('down')
+        , next: integrate('next')
+        , previous: integrate('previous')
+      }
+    , true
+  )
 }(ender);
