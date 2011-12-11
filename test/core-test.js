@@ -1,3 +1,4 @@
+/*global Q:true, T:true, traversty:true, buster:true, assert:true*/
 buster.testCase('traversty.noConflict()', {
 
     'noConflict': function () {
@@ -24,7 +25,7 @@ buster.testCase('traversty.noConflict()', {
       assert.equals((t = T([el = Q('#fixtures')[0], document.body])).length, 2)
       assert.same(t[0], el)
       assert.same(t[1], document.body)
-    } 
+    }
 
   , 'traversty() can be passed selector strings': function () {
       var el, t

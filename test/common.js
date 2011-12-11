@@ -1,3 +1,4 @@
+/*global Q:true, T:true, buster:true, assert:true*/
 // note: `T` is `traversty` and `Q` is `qwery` (selector engine), see setup.js
 
 var commonTests = {
@@ -95,7 +96,7 @@ var commonTests = {
           )
         }
 
-      , 'down(index)': function () { 
+      , 'down(index)': function () {
           assert.hasExactElements(
               T(Q('#fixtures > ul')).down(0)
             , '#fixtures > ul > li:nth-child(1)'
@@ -118,7 +119,7 @@ var commonTests = {
 
   , 'Selector and index argument traversal': {
 
-        'next(selector, index)': function () { 
+        'next(selector, index)': function () {
           assert.hasExactElements(
               T(Q('#fixtures > ul > li:nth-child(1)')).next('li', 1)
             , '#fixtures > ul > li:nth-child(3)'
@@ -144,7 +145,7 @@ var commonTests = {
           )
         }
 
-      , 'next(selector, index) returns unique elements': function () { 
+      , 'next(selector, index) returns unique elements': function () {
           assert.hasExactElements(
               T(Q('#flat *:nth-child(-n+2)')).next('div', 1)
             , '#flat *:nth-child(6)'
@@ -152,7 +153,7 @@ var commonTests = {
           )
         }
 
-      , 'previous(selector, index)': function () { 
+      , 'previous(selector, index)': function () {
           assert.hasExactElements(
               T(Q('#fixtures > ul > li:nth-child(5)')).previous('li', 1)
             , '#fixtures > ul > li:nth-child(3)'
@@ -178,7 +179,7 @@ var commonTests = {
           )
         }
 
-      , 'previous(selector, index) returns unique elements': function () { 
+      , 'previous(selector, index) returns unique elements': function () {
           assert.hasExactElements(
               T(Q('#flat *:nth-child(n+5)')).previous('p', 1)
             , '#flat *:nth-child(1)'
@@ -186,7 +187,7 @@ var commonTests = {
           )
         }
 
-      , 'up(selector, index)': function () { 
+      , 'up(selector, index)': function () {
           assert.hasExactElements(
               T(Q('#fixtures > ul > li > ul > li > span')).up('li', 0)
             , '#fixtures > ul > li > ul > li:nth-child(4)'
@@ -212,7 +213,7 @@ var commonTests = {
           )
         }
 
-      , 'up(selector, index) returns unique elements': function () { 
+      , 'up(selector, index) returns unique elements': function () {
           assert.hasExactElements(
               T(Q('#fixtures > ul > li > ul > li > span')).up('#fixtures', 0)
             , '#fixtures'
@@ -220,7 +221,7 @@ var commonTests = {
           )
         }
 
-      , 'down(selector, index)': function () { 
+      , 'down(selector, index)': function () {
           assert.hasExactElements(
               T(Q('#fixtures > ul')).down('li', 0)
             , '#fixtures > ul > li:nth-child(1)'
@@ -264,7 +265,7 @@ var commonTests = {
           )
         }
 
-      , 'down(selector, index) returns unique elements': function () { 
+      , 'down(selector, index) returns unique elements': function () {
           assert.hasExactElements(
               T(Q('#fixtures, #fixtures > ul:nth-child(1)')).down('li', 0)
             , '#fixtures > ul:nth-child(1) > li:nth-child(1)'

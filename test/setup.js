@@ -1,3 +1,5 @@
+/*global qwery:true, traversty:true, assert: true, buster:true*/
+
 var Q = qwery.noConflict()
 var T = traversty.noConflict()
 
@@ -16,7 +18,7 @@ buster.assertions.add("hasExactElements", {
         if (this.elements[i] !== this.actual[i]) return false
       return true
     }
-  , assertMessage: "Expected ${actual} to be ${elements} (selector: ${1}): ${2}",
+  , assertMessage: "Expected ${actual} to be ${elements} (selector: ${1}): ${2}"
 });
 
 
@@ -74,4 +76,4 @@ document.body.appendChild((function() {
     '      <div>D2</div>\n' +
     '    </div>\n'
   return fixtures
-})())
+}()))

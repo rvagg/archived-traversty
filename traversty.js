@@ -100,9 +100,8 @@
         function T(els) {
           this.length = 0
           if (els) {
-            els = typeof els !== 'string' && !els.nodeType && typeof els.length !== 'undefined' ? els : [ els ]
-            this.length = els.length
-            var i = els.length
+            els = unique(!els.nodeType && !isUndefined(els.length) ? els : [ els ])
+            var i = this.length = els.length
             while (i--) this[i] = els[i]
           }
         }
@@ -111,16 +110,16 @@
             down: function (selector, index) {
               index = getIndex(selector, index)
               selector = getSelector(selector)
-              return traversty(unique(collect(this
+              return traversty(collect(this
                 , function (el) {
                     var f = selectorFind(el, selector)
                     return index === null ? f : ([ f[index] ] || [])
                   }
-                )))
+                ))
             }
 
           , up: function (selector, index) {
-              return traversty(unique(move(this, 'parentNode', selector, index)))
+              return traversty(move(this, 'parentNode', selector, index))
             }
 
           , previous: function (selector, index) {
