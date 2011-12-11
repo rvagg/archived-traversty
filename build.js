@@ -8,20 +8,28 @@ require('smoosh').config({
   }
   , "JSHINT_OPTS": {
       "boss": true
-    , "forin": false
+    , "bitwise": true
+    , "shadow": true
+    , "trailing": true
+    , "immed": true
+    , "latedef": true
+    , "newcap": true
+    , "forin": true
     , "curly": false
-    , "debug": false
+    , "debug": true
     , "devel": false
     , "evil": false
     , "regexp": false
-    , "undef": false
+    , "undef": true
     , "sub": true
     , "white": false
     , "indent": 2
     , "whitespace": true
     , "asi": true
     , "laxbreak": true
-    , "eqeqeq": false
+    , "eqeqeq": true
     , "eqnull": true
+    , "browser": true
+    , "node": true
   }
 }).run().build().analyze()

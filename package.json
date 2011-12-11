@@ -13,7 +13,5 @@
   }
   , "devDependencies": {
       "qwery": "*"
-    , "bowser": "*"
-    , "sink-test": "*"
   }
 }
