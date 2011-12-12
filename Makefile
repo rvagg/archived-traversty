@@ -4,7 +4,7 @@ build:
 	@node build.js
 
 test:
-	buster test
+	buster test -R
 
 server:
 	buster server &

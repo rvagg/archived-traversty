@@ -13,7 +13,12 @@ var own = Object.prototype.hasOwnProperty
         , setUp = function () {
             if (!performedSetUp) {
               customSetUp && customSetUp()
-              T.setSelectorEngine(engine)
+              try {
+                T.setSelectorEngine(engine)
+              } catch(e) {
+                buster.log(e)
+                throw e
+              }
               performedSetUp = true
             }
           }

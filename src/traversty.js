@@ -171,15 +171,6 @@
           e.innerHTML = '<a/><i/><b/>'
           a = e.firstChild
           try {
-            // basic select, can we make this baby work
-            if ((r = select('b,a', e)).length !== 2) throw 'Traversty: don\'t know how to use this selector engine'
-            // check to see if the selector engine has given us the results in document-order
-            // and if not, work around it
-            selectorFind = r[0] === a ? select : createUnorderedEngineSelectorFind(select)
-            // have we done enough to get a working `selectorFind`?
-            if ((r = selectorFind('b,a', e)).length !== 2 || r[0] !== a)
-              throw 'Traversty: couldn\'t make selector engine work'
-
             // check to see how we do a matchesSelector
             selectorMatches =
               s.matching ? function (selector, el) { return s.matching([el], selector).length > 0 } :
@@ -207,6 +198,16 @@
             // verify that we have a working `matchesSelector`
             if (selectorMatches('x,y', e) || !selectorMatches('a,p', e))
                 throw 'Traversty: couldn\'t make selector engine\'s `matchesSelector` work'
+
+            // basic select
+            if ((r = select('b,a', e)).length !== 2) throw 'Traversty: don\'t know how to use this selector engine'
+            // check to see if the selector engine has given us the results in document-order
+            // and if not, work around it
+            selectorFind = r[0] === a ? select : createUnorderedEngineSelectorFind(select)
+            // have we done enough to get a working `selectorFind`?
+            if ((r = selectorFind('b,a', e)).length !== 2 || r[0] !== a)
+              throw 'Traversty: couldn\'t make selector engine work'
+
           } catch (ex) {
             if (isString(ex)) throw ex
             throw 'Traversty: error while figuring out how the selector engine works: ' + ex
