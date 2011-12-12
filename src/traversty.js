@@ -86,13 +86,17 @@
       }
 
     , unique = function (ar) {
-        var a = [], i = -1, j
-        label:
+        var a = [], i = -1, j, has
         while (++i < ar.length) {
           j = -1
-          while (++j < a.length)
-            if (a[j] === ar[i]) continue label
-          a.push(ar[i])
+          has = false
+          while (++j < a.length) {
+            if (a[j] === ar[i]) {
+              has = true
+              break
+            }
+          }
+          if (!has) a.push(ar[i])
         }
         return a
       }
