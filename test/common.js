@@ -323,7 +323,7 @@ var commonTests = {
 
           assert.hasExactElements(
               T(Q('#flat *:nth-child(5)')).previous('span, p')
-            , '#flat *:nth-child(2),#flat p'
+            , '#flat *:nth-child(-n+2),#flat *:nth-child(4)'
             , 'previous("span, p") matches all preceeding <span> and <p> sibling elements'
           )
         }
@@ -331,19 +331,19 @@ var commonTests = {
       , 'up(selector)': function () {
           assert.hasExactElements(
               T(Q('#fixtures > ul > li > ul > li > span')).up('li')
-            , '#fixtures > ul > li:nth-child(4), #fixtures > ul > li > ul > li:nth-child(4)'
+            , '#fixtures > ul:nth-child(1) > li:nth-child(4), #fixtures > ul:nth-child(1) > li > ul > li:nth-child(4),#fixtures > ul > li:nth-child(4), #fixtures > ul > li > ul > li:nth-child(4)'
             , 'up("li") on two deep elements matches all <li> ancestor elements'
           )
 
           assert.hasExactElements(
               T(Q('#fixtures > ul > li > ul > li > span')).up('*')
-            , 'html, body, #fixtures, #fixtures > ul, #fixtures > ul > li:nth-child(4), #fixtures > ul > li:nth-child(4) > ul, #fixtures > ul > li > ul > li:nth-child(4)'
+            , 'html, body, #fixtures, #fixtures > ul:nth-child(1), #fixtures > ul:nth-child(1) > li:nth-child(4), #fixtures > ul:nth-child(1) > li:nth-child(4) > ul, #fixtures > ul:nth-child(1) > li > ul > li:nth-child(4), #fixtures > ul, #fixtures > ul > li:nth-child(4), #fixtures > ul > li:nth-child(4) > ul, #fixtures > ul > li > ul > li:nth-child(4)'
             , 'up("*") on two deep elements matches all ancestor elements up to <html>'
           )
 
           assert.hasExactElements(
               T(Q('#fixtures > ul > li > ul > li > span')).up('ul, li')
-            , '#fixtures > ul, #fixtures > ul > li > ul, #fixtures > ul > li:nth-child(4), #fixtures > ul > li > ul > li:nth-child(4)'
+            , '#fixtures > ul:nth-child(1), #fixtures > ul:nth-child(1) > li:nth-child(4), #fixtures > ul:nth-child(1) > li:nth-child(4) > ul, #fixtures > ul:nth-child(1) > li > ul > li:nth-child(4),#fixtures > ul, #fixtures > ul > li:nth-child(4), #fixtures > ul > li > ul, #fixtures > ul > li > ul > li:nth-child(4)'
             , 'up("ul, li") on two deep elements matches all <ul> and <li> ancestor elements'
           )
         }
@@ -362,8 +362,8 @@ var commonTests = {
           )
 
           assert.hasExactElements(
-              T(Q('#fixtures')).down('li, span')
-            , '#fixtures li, #fixtures span'
+              T(Q('#fixtures > ul:nth-child(1)')).down('li, span')
+            , '#fixtures > ul:nth-child(1) > li:nth-child(-n+4), #fixtures > ul:nth-child(1) > li > ul > li, #fixtures > ul:nth-child(1) > li > ul > li > span, #fixtures > ul:nth-child(1) > li.five'
             , 'down("li, span") selects all descendent <li> and <span> elements, same as qSA'
           )
 

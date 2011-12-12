@@ -1,11 +1,20 @@
-!function ($) {
+/*global ender:true*/
+(function ($) {
   var t = require('traversty')
+    , integrated = false
     , integrate = function(meth) {
-        return function(selector, index) {
-          return $(t(this)[meth](selector, index))
-        }
+        // this crazyness is for lazy initialisation because we can't be guaranteed
+        // that a selector engine has been installed *before* traversty in an ender build
+        var fn = function(self, selector, index) {
+            if (!integrated) {
+              t.setSelectorEngine($)
+              integrated = true
+            }
+            fn = function(self, selector, index) { return $(t(self)[meth](selector, index)) }
+            return fn(self, selector, index)
+          }
+        return function(selector, index) { return fn(this, selector, index) }
       }
-  t.setSelectorEngine($)
   $.ender(
       {
           up: integrate('up')
@@ -15,4 +24,4 @@
       }
     , true
   )
-}(ender);
+}(ender))

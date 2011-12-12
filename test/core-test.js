@@ -1,5 +1,5 @@
-/*global Q:true, T:true, traversty:true, buster:true, assert:true*/
-buster.testCase('traversty.noConflict()', {
+/*global Q:true, T:true, traversty:true, buster:true, assert:true, __matchesSelector:true*/
+buster.testCase('traversty', {
 
     'noConflict': function () {
       assert.equals(traversty(), 'success')
@@ -30,14 +30,16 @@ buster.testCase('traversty.noConflict()', {
   , 'traversty() can be passed selector strings': function () {
       var el, t
 
-      // T("#fixtures") has #fixtures element (only)
-      assert.equals((t = T('#fixtures')).length, 1)
-      assert.same(t[0], Q('#fixtures')[0])
+      if (__matchesSelector) { // defined in setup.js
+        // T("#fixtures") has #fixtures element (only)
+        assert.equals((t = T('#fixtures')).length, 1)
+        assert.same(t[0], Q('#fixtures')[0])
 
-      // T("#fixtures,h1,ol#tests") has all expected 3 elements (only)
-      assert.equals((t = T('#fixtures,div#flat')).length, 2)
-      assert.same(t[0], Q('#fixtures')[0])
-      assert.same(t[1], Q('div#flat')[0])
+        // T("#fixtures,h1,ol#tests") has all expected 3 elements (only)
+        assert.equals((t = T('#fixtures,div#flat')).length, 2)
+        assert.same(t[0], Q('#fixtures')[0])
+        assert.same(t[1], Q('div#flat')[0])
+      }
     }
   }
 )

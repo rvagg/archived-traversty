@@ -2,6 +2,11 @@
 
 var Q = qwery.noConflict()
 var T = traversty.noConflict()
+var __matchesSelector = (function (el, pfx, name, i, ms) {
+  while (i < pfx.length)
+    if (el[ms = pfx[i++] + name]) return ms
+  if (el[name = 'm' + name.substring(1)]) return name
+}(document.documentElement, [ 'ms', 'webkit', 'moz', 'o' ], 'MatchesSelector', 0))
 
 assert.equals.message += ": ${2}";
 assert.same.message += ": ${2}";
@@ -42,7 +47,7 @@ document.body.appendChild((function() {
     '        </ul>\n' +
     '      </li>\n' +
     '      <!-- comment -->\n' +
-    '      <li class="c">FIVE</li>\n' +
+    '      <li class="c five">FIVE</li>\n' +
     '    </ul>\n' +
     '    <ul>\n' +
     '      <!-- comment -->\n' +
@@ -64,7 +69,7 @@ document.body.appendChild((function() {
     '      </li>\n' +
     '      <!-- comment -->\n' +
     '      <!-- comment -->\n' +
-    '      <li class="c">five</li>\n' +
+    '      <li class="c five">five</li>\n' +
     '      <!-- comment -->\n' +
     '    </ul>\n' +
     '    <div id="flat">\n' +

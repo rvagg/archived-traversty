@@ -1,0 +1,63 @@
+<html>
+<head>
+  <title>Traversty Ender (with Qwery) Integration Test</title>
+  <script src="ender_qwery.js"></script>
+  <script>
+    $.domReady(function() {
+      $('#fixtures > ul')
+        .down(0).css('color', 'red')
+        .next('li', 1).css('color', 'green')
+        .next().down('li', 2).css('color', 'blue')
+        .next().down().css('color', 'yellow')
+        .up(2).next().css('color', 'purple')
+    })
+  </script>
+</head>
+<body>
+  <h1>Traversty Ender (with Qwery) Integration Test</h1>
+  <p>The elements with colour names should turn the appropriate colour</p>
+
+  <div id="fixtures">
+    <ul>
+      <li>ONE (red)</li>
+      <li class="c">TWO</li>
+      <li>THREE (green)</li>
+      <li class="c">FOUR
+        <ul>
+          <li>i</li>
+          <li class="c">ii</li>
+          <li>iii (blue)</li>
+          <li class="c">iv
+            <span class="c">SPAN (yellow)</span>
+          </li>
+        </ul>
+      </li>
+      <li class="c">FIVE (purple)</li>
+    </ul>
+    <ul>
+      <li>one (red)</li>
+      <li class="c">two</li>
+      <li>three (green)</li>
+      <li class="c">four
+        <ul>
+          <li>1</li>
+          <li class="c">2</li>
+          <li>3 (blue)</li>
+          <li class="c">4
+            <span class="c">span (yellow)</span>
+          </li>
+        </ul>
+      </li>
+      <li class="c">five (purple)</li>
+    </ul>
+    <div id="flat">
+      <p>P1</p>
+      <span>S1</span>
+      <div>D1</div>
+      <p>P2</p>
+      <span>S2</span>
+      <div>D2</div>
+    </div>
+  </div>
+</body>
+</html>

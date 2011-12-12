@@ -37,11 +37,12 @@ require('smoosh')
   .config({
       'JAVASCRIPT': {
           'DIST_DIR': './'
+        , 'ender': [ './src/ender.js' ]
         , 'tests': [
               './test/buster.js'
             , './test/common.js'
             , './test/core-test.js'
-            , './test/native-test.js'
+            , './test/engines-test.js'
             , './test/noconflict.js'
             , './test/setup.js'
           ]
