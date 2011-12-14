@@ -177,7 +177,7 @@
 
         t.setSelectorEngine = function (s) {
           // feature testing the selector engine like a boss
-          var select = s.select || s.sel || s, r, a, e = doc.createElement('p')
+          var select = s.select || s.sel || s, ss, r, a, e = doc.createElement('p')
           e.innerHTML = '<a/><i/><b/>'
           a = e.firstChild
           try {
@@ -190,12 +190,12 @@
 
             if (!selectorMatches) {
               // perhaps it's an selector(x).is(y) type selector?
-              a = s('a', e)
+              ss = s('a', e)
               selectorMatches =
-                a.matching ? function (selector, el) { return s(el).matching(selector).length > 0 } :
-                  a.is ? function (selector, el) { return s(el).is(selector) } :
-                    a.matchesSelector ? function (selector, el) { return s(el).matchesSelector(selector) } :
-                      a.match ? function (selector, el) { return s(el).match(selector) } : null
+                ss.matching ? function (selector, el) { return s(el).matching(selector).length > 0 } :
+                  ss.is ? function (selector, el) { return s(el).is(selector) } :
+                    ss.matchesSelector ? function (selector, el) { return s(el).matchesSelector(selector) } :
+                      ss.match ? function (selector, el) { return s(el).match(selector) } : null
             }
 
             if (!selectorMatches)
