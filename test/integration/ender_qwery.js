@@ -1,7 +1,7 @@
 /*!
   * =============================================================
   * Ender: open module JavaScript framework (https://ender.no.de)
-  * Build: ender build qwery domready bonzo ../../ --output ender_qwery
+  * Build: ender build domready qwery bonzo traversty --output ender_qwery
   * =============================================================
   */
 
@@ -94,6 +94,76 @@
 
   var module = { exports: {} }, exports = module.exports;
 
+  !function (name, definition) {
+    if (typeof define == 'function') define(definition)
+    else if (typeof module != 'undefined') module.exports = definition()
+    else this[name] = this['domReady'] = definition()
+  }('domready', function (ready) {
+  
+    var fns = [], fn, f = false
+      , doc = document
+      , testEl = doc.documentElement
+      , hack = testEl.doScroll
+      , domContentLoaded = 'DOMContentLoaded'
+      , addEventListener = 'addEventListener'
+      , onreadystatechange = 'onreadystatechange'
+      , loaded = /^loade|c/.test(doc.readyState)
+  
+    function flush(f) {
+      loaded = 1
+      while (f = fns.shift()) f()
+    }
+  
+    doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function () {
+      doc.removeEventListener(domContentLoaded, fn, f)
+      flush()
+    }, f)
+  
+  
+    hack && doc.attachEvent(onreadystatechange, (fn = function () {
+      if (/^c/.test(doc.readyState)) {
+        doc.detachEvent(onreadystatechange, fn)
+        flush()
+      }
+    }))
+  
+    return (ready = hack ?
+      function (fn) {
+        self != top ?
+          loaded ? fn() : fns.push(fn) :
+          function () {
+            try {
+              testEl.doScroll('left')
+            } catch (e) {
+              return setTimeout(function() { ready(fn) }, 50)
+            }
+            fn()
+          }()
+      } :
+      function (fn) {
+        loaded ? fn() : fns.push(fn)
+      })
+  })
+
+  provide("domready", module.exports);
+
+  !function ($) {
+    var ready = require('domready')
+    $.ender({domReady: ready})
+    $.ender({
+      ready: function (f) {
+        ready(f)
+        return this
+      }
+    }, true)
+  }(ender);
+
+}();
+
+!function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
   /*!
     * Qwery - A Blazing Fast query selector engine
     * https://github.com/ded/qwery
@@ -112,7 +182,6 @@
       , html = doc.documentElement
       , byClass = 'getElementsByClassName'
       , byTag = 'getElementsByTagName'
-      , byId = 'getElementById'
       , qSA = 'querySelectorAll'
       , id = /#([\w\-]+)/
       , clas = /\.[\w\-]+/g
@@ -126,7 +195,7 @@
       , splitters = /[\s\>\+\~]/
       , splittersMore = /(?![\s\w\-\/\?\&\=\:\.\(\)\!,@#%<>\{\}\$\*\^'"]*\]|[\s\w\+\-]*\))/
       , specialChars = /([.*+?\^=!:${}()|\[\]\/\\])/g
-      , simple = /^([a-z0-9]+)?(?:([\.\#]+[\w\-\.#]+)?)/
+      , simple = /^(\*|[a-z0-9]+)?(?:([\.\#]+[\w\-\.#]+)?)/
       , attr = /\[([\w\-]+)(?:([\|\^\$\*\~]?\=)['"]?([ \w\-\/\?\&\=\:\.\(\)\!,@#%<>\{\}\$\*\^]+)["']?)?\]/
       , pseudo = /:([\w\-]+)(\(['"]?([\s\w\+\-]+)['"]?\))?/
       , dividers = new RegExp('(' + splitters.source + ')' + splittersMore.source, 'g')
@@ -156,12 +225,12 @@
       this.c = {}
     }
     cache.prototype = {
-        g: function (k) {
-          return this.c[k] || undefined
-        }
-      , s: function (k, v) {
-          return (this.c[k] = v)
-        }
+      g: function (k) {
+        return this.c[k] || undefined
+      }
+    , s: function (k, v) {
+        return (this.c[k] = v)
+      }
     }
   
     var classCache = new cache()
@@ -180,11 +249,7 @@
     }
   
     function flatten(ar) {
-      var r = []
-      each(ar, function(a) {
-        if (arrayLike(a)) r = r.concat(a)
-        else r[r.length] = a
-      });
+      for (var r = [], i = 0, l = ar.length; i < l; ++i) arrayLike(ar[i]) ? (r = r.concat(ar[i])) : (r[r.length] = ar[i])
       return r
     }
   
@@ -208,7 +273,8 @@
     // div.hello[title="world"]:foo('bar'), div, .hello, [title="world"], title, =, world, :foo('bar'), foo, ('bar'), bar]
     function interpret(whole, tag, idsAndClasses, wholeAttribute, attribute, qualifier, value, wholePseudo, pseudo, wholePseudoVal, pseudoVal) {
       var i, m, k, o, classes
-      if (tag && this.tagName && this.tagName.toLowerCase() !== tag) return false
+      if (this.nodeType !== 1) return false
+      if (tag && tag !== '*' && this.tagName && this.tagName.toLowerCase() !== tag) return false
       if (idsAndClasses && (m = idsAndClasses.match(id)) && m[1] !== this.id) return false
       if (idsAndClasses && (classes = idsAndClasses.match(clas))) {
         for (i = classes.length; i--;) {
@@ -264,7 +330,7 @@
       if (!tokens.length) return r
   
       token = (tokens = tokens.slice(0)).pop() // copy cached tokens, take the last one
-      if (tokens.length && (m = tokens[tokens.length - 1].match(idOnly))) root = _root[byId](m[1])
+      if (tokens.length && (m = tokens[tokens.length - 1].match(idOnly))) root = byId(_root, m[1])
       if (!root) return r
   
       intr = q(token)
@@ -302,6 +368,7 @@
           return true
         }
       }
+      return false
     }
   
     // given elements matching the right-most part of a selector, filter out any that don't match the rest
@@ -320,16 +387,17 @@
       return (cand = crawl(el, tokens.length - 1, el)) && (!root || isAncestor(cand, root))
     }
   
-    function isNode(el) {
-      return el && typeof el === 'object' && el.nodeType && (el.nodeType == 1 || el.nodeType == 9)
+    function isNode(el, t) {
+      return el && typeof el === 'object' && (t = el.nodeType) && (t == 1 || t == 9)
     }
   
     function uniq(ar) {
-      var a = [], i, j;
-      label:
-      for (i = 0; i < ar.length; i++) {
-        for (j = 0; j < a.length; j++) {
-          if (a[j] == ar[i]) continue label;
+      var a = [], i, j
+      o: for (i = 0; i < ar.length; ++i) {
+        for (j = 0; j < a.length; ++j) {
+          if (a[j] == ar[i]) {
+            continue o
+          }
         }
         a[a.length] = ar[i]
       }
@@ -343,8 +411,16 @@
     function normalizeRoot(root) {
       if (!root) return doc
       if (typeof root == 'string') return qwery(root)[0]
-      if (arrayLike(root)) return root[0]
+      if (!root.nodeType && arrayLike(root)) return root[0]
       return root
+    }
+  
+    function byId(root, id, el) {
+      // if doc, query on it, else query the parent doc or if a detached fragment rewrite the query and run on the fragment
+      return root.nodeType === 9 ? root.getElementById(id) :
+        root.ownerDocument &&
+          (((el = root.ownerDocument.getElementById(id)) && isAncestor(el, root) && el) ||
+            (!isAncestor(root, root.ownerDocument) && select('[id="' + id + '"]', root)[0]))
     }
   
     function qwery(selector, _root) {
@@ -357,7 +433,7 @@
       }
       if (selector && arrayLike(selector)) return flatten(selector)
       if (m = selector.match(easy)) {
-        if (m[1]) return (el = root[byId](m[1])) ? [el] : []
+        if (m[1]) return (el = byId(root, m[1])) ? [el] : []
         if (m[2]) return arrayify(root[byTag](m[2]))
         if (supportsCSS3 && m[3]) return arrayify(root[byClass](m[3]))
       }
@@ -420,17 +496,20 @@
       // native support for CSS3 selectors
     , selectCSS3 = function (selector, root) {
         var result = [], ss, e
-        if (root.nodeType === 9 || !splittable.test(selector)) {
-          // most work is done right here, defer to qSA
-          return arrayify(root[qSA](selector))
-        }
-        // special case where we need the services of `collectSelector()`
-        each(ss = selector.split(','), collectSelector(root, function(ctx, s) {
-          e = ctx[qSA](s)
-          if (e.length == 1) result[result.length] = e.item(0)
-          else if (e.length) result = result.concat(arrayify(e))
-        }))
-        return ss.length > 1 && result.length > 1 ? uniq(result) : result
+        try {
+          if (root.nodeType === 9 || !splittable.test(selector)) {
+            // most work is done right here, defer to qSA
+            return arrayify(root[qSA](selector))
+          }
+          // special case where we need the services of `collectSelector()`
+          each(ss = selector.split(','), collectSelector(root, function(ctx, s) {
+            e = ctx[qSA](s)
+            if (e.length == 1) result[result.length] = e.item(0)
+            else if (e.length) result = result.concat(arrayify(e))
+          }))
+          return ss.length > 1 && result.length > 1 ? uniq(result) : result
+        } catch(ex) { }
+        return selectNonNative(selector, root)
       }
       // native support for CSS2 selectors only
     , selectCSS2qSA = function (selector, root) {
@@ -449,7 +528,7 @@
       }
       // no native selector support
     , selectNonNative = function (selector, root) {
-        var result = [], m, i, l, r, ss
+        var result = [], items, m, i, l, r, ss
         selector = selector.replace(normalizr, '$1')
         if (m = selector.match(tagAndOrClass)) {
           r = classRegex(m[2])
@@ -534,76 +613,6 @@
     }, true)
   }(document, ender);
   
-
-}();
-
-!function () {
-
-  var module = { exports: {} }, exports = module.exports;
-
-  !function (name, definition) {
-    if (typeof define == 'function') define(definition)
-    else if (typeof module != 'undefined') module.exports = definition()
-    else this[name] = this['domReady'] = definition()
-  }('domready', function (ready) {
-  
-    var fns = [], fn, f = false
-      , doc = document
-      , testEl = doc.documentElement
-      , hack = testEl.doScroll
-      , domContentLoaded = 'DOMContentLoaded'
-      , addEventListener = 'addEventListener'
-      , onreadystatechange = 'onreadystatechange'
-      , loaded = /^loade|c/.test(doc.readyState)
-  
-    function flush(f) {
-      loaded = 1
-      while (f = fns.shift()) f()
-    }
-  
-    doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function () {
-      doc.removeEventListener(domContentLoaded, fn, f)
-      flush()
-    }, f)
-  
-  
-    hack && doc.attachEvent(onreadystatechange, (fn = function () {
-      if (/^c/.test(doc.readyState)) {
-        doc.detachEvent(onreadystatechange, fn)
-        flush()
-      }
-    }))
-  
-    return (ready = hack ?
-      function (fn) {
-        self != top ?
-          loaded ? fn() : fns.push(fn) :
-          function () {
-            try {
-              testEl.doScroll('left')
-            } catch (e) {
-              return setTimeout(function() { ready(fn) }, 50)
-            }
-            fn()
-          }()
-      } :
-      function (fn) {
-        loaded ? fn() : fns.push(fn)
-      })
-  })
-
-  provide("domready", module.exports);
-
-  !function ($) {
-    var ready = require('domready')
-    $.ender({domReady: ready})
-    $.ender({
-      ready: function (f) {
-        ready(f)
-        return this
-      }
-    }, true)
-  }(ender);
 
 }();
 
@@ -1370,17 +1379,17 @@
     }
   
     function uniq(ar) {
-      var a = [], i, j
-      label:
-      for (i = 0; i < ar.length; i++) {
-        for (j = 0; j < a.length; j++) {
-          if (a[j] == ar[i]) {
-            continue label
+      var r = [], i = 0, j = 0, k, item, inIt
+      for (; item = ar[i]; ++i) {
+        inIt = false
+        for (k = 0; k < r.length; ++k) {
+          if (r[k] === item) {
+            inIt = true; break
           }
         }
-        a[a.length] = ar[i]
+        if (!inIt) r[j++] = item
       }
-      return a
+      return r
     }
   
     $.ender({
@@ -1577,13 +1586,17 @@
         }
   
       , unique = function (ar) {
-          var a = [], i = -1, j
-          label:
+          var a = [], i = -1, j, has
           while (++i < ar.length) {
             j = -1
-            while (++j < a.length)
-              if (a[j] === ar[i]) continue label
-            a.push(ar[i])
+            has = false
+            while (++j < a.length) {
+              if (a[j] === ar[i]) {
+                has = true
+                break
+              }
+            }
+            if (!has) a.push(ar[i])
           }
           return a
         }
@@ -1658,19 +1671,10 @@
   
           t.setSelectorEngine = function (s) {
             // feature testing the selector engine like a boss
-            var select = s.select || s.sel || s, r, a, e = doc.createElement('p')
+            var select = s.select || s.sel || s, ss, r, a, e = doc.createElement('p')
             e.innerHTML = '<a/><i/><b/>'
             a = e.firstChild
             try {
-              // basic select, can we make this baby work
-              if ((r = select('b,a', e)).length !== 2) throw 'Traversty: don\'t know how to use this selector engine'
-              // check to see if the selector engine has given us the results in document-order
-              // and if not, work around it
-              selectorFind = r[0] === a ? select : createUnorderedEngineSelectorFind(select)
-              // have we done enough to get a working `selectorFind`?
-              if ((r = selectorFind('b,a', e)).length !== 2 || r[0] !== a)
-                throw 'Traversty: couldn\'t make selector engine work'
-  
               // check to see how we do a matchesSelector
               selectorMatches =
                 s.matching ? function (selector, el) { return s.matching([el], selector).length > 0 } :
@@ -1680,12 +1684,12 @@
   
               if (!selectorMatches) {
                 // perhaps it's an selector(x).is(y) type selector?
-                a = s('a', e)
+                ss = s('a', e)
                 selectorMatches =
-                  a.matching ? function (selector, el) { return s(el).matching(selector).length > 0 } :
-                    a.is ? function (selector, el) { return s(el).is(selector) } :
-                      a.matchesSelector ? function (selector, el) { return s(el).matchesSelector(selector) } :
-                        a.match ? function (selector, el) { return s(el).match(selector) } : null
+                  ss.matching ? function (selector, el) { return s(el).matching(selector).length > 0 } :
+                    ss.is ? function (selector, el) { return s(el).is(selector) } :
+                      ss.matchesSelector ? function (selector, el) { return s(el).matchesSelector(selector) } :
+                        ss.match ? function (selector, el) { return s(el).match(selector) } : null
               }
   
               if (!selectorMatches)
@@ -1698,6 +1702,16 @@
               // verify that we have a working `matchesSelector`
               if (selectorMatches('x,y', e) || !selectorMatches('a,p', e))
                   throw 'Traversty: couldn\'t make selector engine\'s `matchesSelector` work'
+  
+              // basic select
+              if ((r = select('b,a', e)).length !== 2) throw 'Traversty: don\'t know how to use this selector engine'
+              // check to see if the selector engine has given us the results in document-order
+              // and if not, work around it
+              selectorFind = r[0] === a ? select : createUnorderedEngineSelectorFind(select)
+              // have we done enough to get a working `selectorFind`?
+              if ((r = selectorFind('b,a', e)).length !== 2 || r[0] !== a)
+                throw 'Traversty: couldn\'t make selector engine work'
+  
             } catch (ex) {
               if (isString(ex)) throw ex
               throw 'Traversty: error while figuring out how the selector engine works: ' + ex
