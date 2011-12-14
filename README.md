@@ -128,6 +128,14 @@ traversty('#root').down('li', 5) // →  will give you `<li>i</li>` because the 
 Of course `down()` works on multiple elements simultaneously just like the other methods.
 
 
+I want a demo!
+--------------
+
+You'll have to make do with the integration tests. [Here](http://rvagg.github.com/traversty/test/integration/ender_qwery.html) is Traversty running in an Ender build with Qwery and Bonzo and [here](http://rvagg.github.com/traversty/test/integration/ender_sel.html) is the same but with Sel instead of Qwery as the selector engine.
+
+View-source to see what it's doing, note that it's operating on 2 lists at the same time.
+
+
 Things to note
 --------------
 
