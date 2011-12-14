@@ -1,1 +1,0 @@
-function traversty() { return 'success' }
