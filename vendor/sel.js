@@ -268,7 +268,7 @@
         var doc, el;
         doc = root.ownerDocument || root;
         if (root === doc || contains(doc.documentElement, root)) {
-          el = doc.getElementById(id);
+          el = doc.getElementById(e.id);
           if (el && contains(root, el)) els.push(el);
         } else {
           extend(els, root.getElementsByTagName(e.tag || '*'));
