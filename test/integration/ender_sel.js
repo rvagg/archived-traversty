@@ -1258,7 +1258,7 @@
               selectorFind = _selectorFind
             } catch (ex) {
               if (isString(ex)) throw ex
-              throw 'Traversty: error while figuring out how the selector engine works: ' + ex
+              throw 'Traversty: error while figuring out how the selector engine works: ' + (ex.message || ex)
             } finally {
               e = null
             }
@@ -1798,7 +1798,7 @@
           var doc, el;
           doc = root.ownerDocument || root;
           if (root === doc || contains(doc.documentElement, root)) {
-            el = doc.getElementById(id);
+            el = doc.getElementById(e.id);
             if (el && contains(root, el)) els.push(el);
           } else {
             extend(els, root.getElementsByTagName(e.tag || '*'));
