@@ -1,7 +1,7 @@
 /*!
   * =============================================================
   * Ender: open module JavaScript framework (https://ender.no.de)
-  * Build: ender build domready qwery bonzo traversty --output ender_qwery
+  * Build: ender build domready qwery bonzo ../.. --output ender_qwery
   * =============================================================
   */
 
@@ -1054,6 +1054,18 @@
           })
         }
   
+      , focus: function () {
+          return this.each(function (el) {
+            el.focus()
+          })
+        }
+  
+      , blur: function () {
+          return this.each(function (el) {
+            el.blur()
+          })
+        }
+  
       , css: function (o, v, p) {
           // is this a request for just getting a style?
           if (v === undefined && typeof o == 'string') {
@@ -1560,7 +1572,7 @@
         // used in the case where our selector engine does out-of-order element returns for
         // grouped selectors, e.g. '.class, tag', we need our elements in document-order
         // so we do it ourselves if need be
-      , createUnorderedEngineSelectorFind = function(engineSelect) {
+      , createUnorderedEngineSelectorFind = function(engineSelect, selectorMatches) {
           return function (selector, el) {
             if (/,/.test(selector)) {
               var ret = [], i = -1, els = el.getElementsByTagName('*')
@@ -1570,18 +1582,6 @@
               return ret
             }
             return engineSelect(selector, el)
-          }
-        }
-  
-        // used in the case where our selector engine can't handle matches('x,y') properly
-        // (Sel), so we split up the selector and feed it in parts
-      , createSplittingEngineSelectorMatches = function(engineMatches) {
-          return function(selector, el) {
-            var s = selector.split(','), i = s.length
-            while (i--) {
-              if (engineMatches(s[i], el)) return true
-            }
-            return false
           }
         }
   
@@ -1671,47 +1671,47 @@
   
           t.setSelectorEngine = function (s) {
             // feature testing the selector engine like a boss
-            var select = s.select || s.sel || s, ss, r, a, e = doc.createElement('p')
+            var ss, r, a, _selectorMatches, _selectorFind
+              , e = doc.createElement('p')
+              , select = s.select || s.sel || s
             e.innerHTML = '<a/><i/><b/>'
             a = e.firstChild
             try {
               // check to see how we do a matchesSelector
-              selectorMatches =
+              _selectorMatches =
                 s.matching ? function (selector, el) { return s.matching([el], selector).length > 0 } :
                   s.is ? function (selector, el) { return s.is(el, selector) } :
                     s.matchesSelector ? function (selector, el) { return s.matchesSelector(el, selector) } :
                       s.match ? function (selector, el) { return s.match(el, selector) } : null
   
-              if (!selectorMatches) {
+              if (!_selectorMatches) {
                 // perhaps it's an selector(x).is(y) type selector?
                 ss = s('a', e)
-                selectorMatches =
+                _selectorMatches =
                   ss.matching ? function (selector, el) { return s(el).matching(selector).length > 0 } :
                     ss.is ? function (selector, el) { return s(el).is(selector) } :
                       ss.matchesSelector ? function (selector, el) { return s(el).matchesSelector(selector) } :
                         ss.match ? function (selector, el) { return s(el).match(selector) } : null
               }
   
-              if (!selectorMatches)
+              if (!_selectorMatches)
                   throw 'Traversty: couldn\'t find selector engine\'s `matchesSelector`'
   
-              // do we have a grouping selector problem? (Sel)
-              if (selectorMatches('x,y', e))
-                selectorMatches = createSplittingEngineSelectorMatches(selectorMatches)
-  
               // verify that we have a working `matchesSelector`
-              if (selectorMatches('x,y', e) || !selectorMatches('a,p', e))
+              if (_selectorMatches('x,y', e) || !_selectorMatches('a,p', e))
                   throw 'Traversty: couldn\'t make selector engine\'s `matchesSelector` work'
   
               // basic select
               if ((r = select('b,a', e)).length !== 2) throw 'Traversty: don\'t know how to use this selector engine'
               // check to see if the selector engine has given us the results in document-order
               // and if not, work around it
-              selectorFind = r[0] === a ? select : createUnorderedEngineSelectorFind(select)
+              _selectorFind = r[0] === a ? select : createUnorderedEngineSelectorFind(select, _selectorMatches)
               // have we done enough to get a working `selectorFind`?
-              if ((r = selectorFind('b,a', e)).length !== 2 || r[0] !== a)
+              if ((r = _selectorFind('b,a', e)).length !== 2 || r[0] !== a)
                 throw 'Traversty: couldn\'t make selector engine work'
   
+              selectorMatches = _selectorMatches
+              selectorFind = _selectorFind
             } catch (ex) {
               if (isString(ex)) throw ex
               throw 'Traversty: error while figuring out how the selector engine works: ' + ex
@@ -1743,7 +1743,9 @@
           // that a selector engine has been installed *before* traversty in an ender build
           var fn = function(self, selector, index) {
               if (!integrated) {
-                t.setSelectorEngine($)
+                try {
+                  t.setSelectorEngine($)
+                } catch (ex) { } // ignore exception, we may have an ender build with no selector engine
                 integrated = true
               }
               fn = function(self, selector, index) { return $(t(self)[meth](selector, index)) }
