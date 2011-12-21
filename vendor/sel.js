@@ -2,7 +2,7 @@
 (function(sel) {
   /* util.coffee
   */
-  var attrPattern, checkNth, combinatorPattern, combine, contains, create, eachElement, elCmp, evaluate, extend, filter, filterDescendants, find, html, name, nextElementSibling, normalizeRoots, nthPattern, outerDescendants, parentMap, parse, parseSimple, pseudoPattern, select, selectorGroups, selectorPattern, synonym, tagPattern, _attrMap, _positionalPseudos, _ref;
+  var attrPattern, checkNth, combinatorPattern, combine, contains, create, eachElement, elCmp, evaluate, extend, filter, filterDescendants, find, findRoots, html, name, nextElementSibling, normalizeRoots, nthPattern, outerParents, parentMap, parse, parseSimple, pseudoPattern, qSA, select, selectorGroups, selectorPattern, synonym, tagPattern, takeElements, _attrMap, _positionalPseudos, _ref;
   html = document.documentElement;
   extend = function(a, b) {
     var x, _i, _len;
@@ -11,6 +11,11 @@
       a.push(x);
     }
     return a;
+  };
+  takeElements = function(els) {
+    return els.filter(function(el) {
+      return el.nodeType === 1;
+    });
   };
   eachElement = function(el, first, next, fn) {
     el = el[first];
@@ -65,13 +70,19 @@
       return el && !(i && (els[i - 1] === el || contains(els[i - 1], el)));
     });
   };
-  outerDescendants = function(els) {
+  outerParents = function(els) {
+    return filterDescendents(els.map(function(el) {
+      return el.parentNode;
+    }));
+  };
+  findRoots = function(els) {
     var r;
     r = [];
-    filterDescendants(els).forEach(function(el) {
-      var parent;
-      parent = el.parentNode;
-      if (parent && parent !== r[r.length - 1]) r.push(parent);
+    els.forEach(function(el) {
+      while (el.parentNode) {
+        el = el.parentNode;
+      }
+      if (r[r.length - 1] !== el) r.push(el);
     });
     return r;
   };
@@ -132,6 +143,101 @@
       '1': -2
     });
   };
+  /* parser.coffee
+  */
+  attrPattern = /\[\s*([-\w]+)\s*(?:([~|^$*!]?=)\s*(?:([-\w]+)|['"]([^'"]*)['"])\s*)?\]/g;
+  pseudoPattern = /::?([-\w]+)(?:\((\([^()]+\)|[^()]+)\))?/g;
+  combinatorPattern = /^\s*([,+~])/;
+  selectorPattern = RegExp("^(?:\\s*(>))?\\s*(?:(\\*|\\w+))?(?:\\#([-\\w]+))?(?:\\.([-\\.\\w]+))?((?:" + attrPattern.source + ")*)((?:" + pseudoPattern.source + ")*)");
+  selectorGroups = {
+    type: 1,
+    tag: 2,
+    id: 3,
+    classes: 4,
+    attrsAll: 5,
+    pseudosAll: 10
+  };
+  parse = function(selector) {
+    var e, last, result;
+    if (selector in parse.cache) return parse.cache[selector];
+    result = last = e = parseSimple(selector);
+    if (e.compound) e.children = [];
+    while (e[0].length < selector.length) {
+      selector = selector.substr(last[0].length);
+      e = parseSimple(selector);
+      if (e.compound) {
+        e.children = [result];
+        result = e;
+      } else if (last.compound) {
+        last.children.push(e);
+      } else {
+        last.child = e;
+      }
+      last = e;
+    }
+    return (parse.cache[selector] = result);
+  };
+  parse.cache = {};
+  parseSimple = function(selector) {
+    var e, group, name;
+    if (e = combinatorPattern.exec(selector)) {
+      e.compound = true;
+      e.type = e[1];
+    } else if (e = selectorPattern.exec(selector)) {
+      e.simple = true;
+      for (name in selectorGroups) {
+        group = selectorGroups[name];
+        e[name] = e[group];
+      }
+      e.type || (e.type = ' ');
+      e.tag && (e.tag = e.tag.toLowerCase());
+      if (e.classes) e.classes = e.classes.toLowerCase().split('.');
+      if (e.attrsAll) {
+        e.attrs = [];
+        e.attrsAll.replace(attrPattern, function(all, name, op, val, quotedVal) {
+          name = name.toLowerCase();
+          val || (val = quotedVal);
+          if (op === '=') {
+            if (name === 'id' && !e.id) {
+              e.id = val;
+              return "";
+            } else if (name === 'class') {
+              if (e.classes) {
+                e.classes.append(val);
+              } else {
+                e.classes = [val];
+              }
+              return "";
+            }
+          }
+          e.attrs.push({
+            name: name,
+            op: op,
+            val: val
+          });
+          return "";
+        });
+      }
+      if (e.pseudosAll) {
+        e.pseudos = [];
+        e.pseudosAll.replace(pseudoPattern, function(all, name, val) {
+          name = name.toLowerCase();
+          if (name === 'not') {
+            e.not = parse(val);
+          } else {
+            e.pseudos.push({
+              name: name,
+              val: val
+            });
+          }
+          return "";
+        });
+      }
+    } else {
+      throw new Error("Parse error at: " + selector);
+    }
+    return e;
+  };
   /* find.coffee
   */
   _attrMap = {
@@ -142,19 +248,6 @@
       return el.className;
     }
   };
-  (function() {
-    var p;
-    p = document.createElement('p');
-    p.innerHTML = '<a href="#"></a>';
-    if (p.firstChild.getAttribute('href') !== '#') {
-      _attrMap['href'] = function(el) {
-        return el.getAttribute('href', 2);
-      };
-      return _attrMap['src'] = function(el) {
-        return el.getAttribute('src', 2);
-      };
-    }
-  })();
   _positionalPseudos = {
     'nth-child': false,
     'nth-of-type': false,
@@ -172,45 +265,52 @@
     if (e.id) {
       els = [];
       roots.forEach(function(root) {
-        var el;
-        el = (root.ownerDocument || root).getElementById(e.id);
-        if (el && contains(root, el)) els.push(el);
+        var doc, el;
+        doc = root.ownerDocument || root;
+        if (root === doc || contains(doc.documentElement, root)) {
+          el = doc.getElementById(id);
+          if (el && contains(root, el)) els.push(el);
+        } else {
+          extend(els, root.getElementsByTagName(e.tag || '*'));
+        }
       });
-      e.id = null;
-    } else if (e.classes && html.getElementsByClassName) {
+    } else if (e.classes && find.byClass) {
       els = roots.map(function(root) {
         return e.classes.map(function(cls) {
           return root.getElementsByClassName(cls);
         }).reduce(sel.union);
       }).reduce(extend, []);
-      e.classes = null;
+      e.ignoreClasses = true;
     } else {
       els = roots.map(function(root) {
         return root.getElementsByTagName(e.tag || '*');
       }).reduce(extend, []);
-      e.tag = null;
+      if (find.filterComments && (!e.tag || e.tag === '*')) {
+        els = takeElements(els);
+      }
+      e.ignoreTag = true;
     }
     if (els && els.length) {
-      return filter(e, els);
+      els = filter(e, els);
     } else {
-      return [];
+      els = [];
     }
+    e.ignoreTag = void 0;
+    e.ignoreClasses = void 0;
+    return els;
   };
   filter = function(e, els) {
-    els = els.filter(function(el) {
-      return el.nodeType === 1;
-    });
     if (e.id) {
       els = els.filter(function(el) {
         return el.id === e.id;
       });
     }
-    if (e.tag && e.tag !== '*') {
+    if (e.tag && e.tag !== '*' && !e.ignoreTag) {
       els = els.filter(function(el) {
         return el.nodeName.toLowerCase() === e.tag;
       });
     }
-    if (e.classes) {
+    if (e.classes && !e.ignoreClasses) {
       e.classes.forEach(function(cls) {
         els = els.filter(function(el) {
           return (" " + el.className + " ").indexOf(" " + cls + " ") >= 0;
@@ -271,6 +371,28 @@
     }
     return els;
   };
+  (function() {
+    var div;
+    div = document.createElement('div');
+    div.innerHTML = '<a href="#"></a>';
+    if (div.firstChild.getAttribute('href') !== '#') {
+      _attrMap['href'] = function(el) {
+        return el.getAttribute('href', 2);
+      };
+      _attrMap['src'] = function(el) {
+        return el.getAttribute('src', 2);
+      };
+    }
+    div.innerHTML = '<div class="a b"></div><div class="a"></div>';
+    if (div.getElementsByClassName && div.getElementsByClassName('b').length) {
+      div.lastChild.className = 'b';
+      if (div.getElementsByClassName('b').length === 2) find.byClass = true;
+    }
+    div.innerHTML = '';
+    div.appendChild(document.createComment(''));
+    if (div.getElementsByTagName('*').length > 0) find.filterComments = true;
+    div = null;
+  })();
   /* pseudos.coffee
   */
   nthPattern = /\s*((?:\+|\-)?(\d*))n\s*((?:\+|\-)\s*\d+)?\s*/;
@@ -358,86 +480,9 @@
     name = _ref[synonym];
     sel.pseudos[synonym] = sel.pseudos[name];
   }
-  /* parser.coffee
-  */
-  attrPattern = /\[\s*([-\w]+)\s*(?:([~|^$*!]?=)\s*(?:([-\w]+)|['"]([^'"]*)['"])\s*)?\]/g;
-  pseudoPattern = /::?([-\w]+)(?:\((\([^()]+\)|[^()]+)\))?/g;
-  combinatorPattern = /^\s*([,+~])/;
-  selectorPattern = RegExp("^(?:\\s*(>))?\\s*(?:(\\*|\\w+))?(?:\\#([-\\w]+))?(?:\\.([-\\.\\w]+))?((?:" + attrPattern.source + ")*)((?:" + pseudoPattern.source + ")*)");
-  selectorGroups = {
-    type: 1,
-    tag: 2,
-    id: 3,
-    classes: 4,
-    attrsAll: 5,
-    pseudosAll: 10
-  };
-  parse = function(selector) {
-    var e, last, result;
-    result = last = parseSimple(selector);
-    if (last.compound) last.children = [];
-    while (last[0].length < selector.length) {
-      selector = selector.substr(last[0].length);
-      e = parseSimple(selector);
-      if (e.compound) {
-        e.children = [result];
-        result = e;
-      } else if (last.compound) {
-        last.children.push(e);
-      } else {
-        last.child = e;
-      }
-      last = e;
-    }
-    return result;
-  };
-  parseSimple = function(selector) {
-    var e, group, name;
-    if (e = combinatorPattern.exec(selector)) {
-      e.compound = true;
-      e.type = e[1];
-    } else if (e = selectorPattern.exec(selector)) {
-      e.simple = true;
-      for (name in selectorGroups) {
-        group = selectorGroups[name];
-        e[name] = e[group];
-      }
-      e.type || (e.type = ' ');
-      if (e.tag) e.tag = e.tag.toLowerCase();
-      if (e.classes) e.classes = e.classes.toLowerCase().split('.');
-      if (e.attrsAll) {
-        e.attrs = [];
-        e.attrsAll.replace(attrPattern, function(all, name, op, val, quotedVal) {
-          e.attrs.push({
-            name: name,
-            op: op,
-            val: val || quotedVal
-          });
-          return "";
-        });
-      }
-      if (e.pseudosAll) {
-        e.pseudos = [];
-        e.pseudosAll.replace(pseudoPattern, function(all, name, val) {
-          if (name === 'not') {
-            e.not = parse(val);
-          } else {
-            e.pseudos.push({
-              name: name,
-              val: val
-            });
-          }
-          return "";
-        });
-      }
-    } else {
-      throw new Error("Parse error at: " + selector);
-    }
-    return e;
-  };
   /* eval.coffee
   */
-  evaluate = function(e, roots) {
+  evaluate = function(e, roots, matchRoots) {
     var els, outerRoots, sibs;
     els = [];
     if (roots.length) {
@@ -454,22 +499,26 @@
               if ((el = el.parentNode)) return el._sel_mark;
             });
             roots.forEach(function(el) {
-              el._sel_mark = false;
+              el._sel_mark = void 0;
             });
           }
-          if (e.not) els = sel.difference(els, find(e.not, outerRoots));
+          if (e.not) {
+            els = sel.difference(els, find(e.not, outerRoots, matchRoots));
+          }
+          if (matchRoots) {
+            els = sel.union(els, filter(e, takeElements(outerRoots)));
+          }
           if (e.child) els = evaluate(e.child, els);
           break;
         case '+':
         case '~':
         case ',':
           if (e.children.length === 2) {
-            sibs = evaluate(e.children[0], roots);
-            els = evaluate(e.children[1], roots);
+            sibs = evaluate(e.children[0], roots, matchRoots);
+            els = evaluate(e.children[1], roots, matchRoots);
           } else {
             sibs = roots;
-            roots = outerDescendants(roots);
-            els = evaluate(e.children[0], roots);
+            els = evaluate(e.children[0], outerParents(roots), matchRoots);
           }
           if (e.type === ',') {
             els = sel.union(sibs, els);
@@ -525,16 +574,30 @@
     });
     return els;
   };
-  select = document.querySelector && document.querySelectorAll ? function(selector, roots) {
-    try {
-      return roots.map(function(root) {
-        return root.querySelectorAll(selector);
-      }).reduce(extend, []);
-    } catch (e) {
-      return evaluate(parse(selector), roots);
+  qSA = function(selector, root) {
+    var els, id;
+    if (root.nodeType === 1) {
+      id = root.id;
+      if (!id) root.id = '_sel_root';
+      selector = "#" + root.id + " " + selector;
     }
-  } : function(selector, roots) {
-    return evaluate(parse(selector), roots);
+    els = root.querySelectorAll(selector);
+    if (root.nodeType === 1 && !id) root.removeAttribute('id');
+    return els;
+  };
+  select = html.querySelectorAll ? function(selector, roots, matchRoots) {
+    if (!matchRoots && !combinatorPattern.exec(selector)) {
+      try {
+        return roots.map(function(root) {
+          return qSA(selector, root);
+        }).reduce(extend, []);
+      } catch (e) {
+
+      }
+    }
+    return evaluate(parse(selector), roots, matchRoots);
+  } : function(selector, roots, matchRoots) {
+    return evaluate(parse(selector), roots, matchRoots);
   };
   normalizeRoots = function(roots) {
     if (!roots) {
@@ -542,13 +605,17 @@
     } else if (typeof roots === 'string') {
       return select(roots, [document]);
     } else if (typeof roots === 'object' && isFinite(roots.length)) {
-      if (roots.sort) roots.sort(elCmp);
-      return filterDescendants(roots);
+      if (roots.sort) {
+        roots.sort(elCmp);
+      } else {
+        roots = extend([], roots);
+      }
+      return roots;
     } else {
       return [roots];
     }
   };
-  sel.sel = function(selector, _roots) {
+  sel.sel = function(selector, _roots, matchRoots) {
     var roots;
     roots = normalizeRoots(_roots);
     if (!selector) {
@@ -570,10 +637,16 @@
         return [];
       }
     } else {
-      return select(selector, roots);
+      return select(selector, roots, matchRoots);
     }
   };
-  return sel.matching = function(els, selector) {
-    return filter(parse(selector), els);
+  return sel.matching = function(els, selector, roots) {
+    var e;
+    e = parse(selector);
+    if (!e.child && !e.children) {
+      return filter(e, els);
+    } else {
+      return sel.intersection(els, sel.sel(selector, roots || findRoots(els), true));
+    }
   };
 })(typeof exports !== "undefined" && exports !== null ? exports : (this['sel'] = {}));

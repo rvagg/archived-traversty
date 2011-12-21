@@ -7,7 +7,9 @@
         // that a selector engine has been installed *before* traversty in an ender build
         var fn = function(self, selector, index) {
             if (!integrated) {
-              t.setSelectorEngine($)
+              try {
+                t.setSelectorEngine($)
+              } catch (ex) { } // ignore exception, we may have an ender build with no selector engine
               integrated = true
             }
             fn = function(self, selector, index) { return $(t(self)[meth](selector, index)) }
