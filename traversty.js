@@ -32,6 +32,10 @@
         return toString.call(o) === '[object String]'
       }
 
+    , isFunction = function (o) {
+        return toString.call(o) === '[object Function]'
+      }
+
     , isUndefined = function (o) {
         return o === void 0
       }
@@ -173,19 +177,19 @@
           try {
             // check to see how we do a matchesSelector
             _selectorMatches =
-              s.matching ? function (selector, el) { return s.matching([el], selector).length > 0 } :
-                s.is ? function (selector, el) { return s.is(el, selector) } :
-                  s.matchesSelector ? function (selector, el) { return s.matchesSelector(el, selector) } :
-                    s.match ? function (selector, el) { return s.match(el, selector) } : null
+              isFunction(s.matching) ? function (selector, el) { return s.matching([el], selector).length > 0 } :
+                isFunction(s.is) ? function (selector, el) { return s.is(el, selector) } :
+                  isFunction(s.matchesSelector) ? function (selector, el) { return s.matchesSelector(el, selector) } :
+                    isFunction(s.match) ? function (selector, el) { return s.match(el, selector) } : null
 
             if (!_selectorMatches) {
               // perhaps it's an selector(x).is(y) type selector?
               ss = s('a', e)
               _selectorMatches =
-                ss.matching ? function (selector, el) { return s(el).matching(selector).length > 0 } :
-                  ss.is ? function (selector, el) { return s(el).is(selector) } :
-                    ss.matchesSelector ? function (selector, el) { return s(el).matchesSelector(selector) } :
-                      ss.match ? function (selector, el) { return s(el).match(selector) } : null
+                isFunction(ss.matching) ? function (selector, el) { return s(el).matching(selector).length > 0 } :
+                  isFunction(ss.is) ? function (selector, el) { return s(el).is(selector) } :
+                    isFunction(ss.matchesSelector) ? function (selector, el) { return s(el).matchesSelector(selector) } :
+                      isFunction(ss.match) ? function (selector, el) { return s(el).match(selector) } : null
             }
 
             if (!_selectorMatches)
