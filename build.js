@@ -1,5 +1,6 @@
 var jshintOptions = {
-    'boss': true
+    'predef': [ 'define' ]
+  , 'boss': true
   , 'bitwise': true
   , 'shadow': true
   , 'trailing': true

@@ -1,4 +1,3 @@
-/*global module:true, define:true*/
 !(function (name, definition) {
   if (typeof module !== 'undefined') module.exports = definition()
   else if (typeof define === 'function' && define.amd) define(name, definition)
