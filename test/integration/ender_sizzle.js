@@ -94,76 +94,6 @@
 
   var module = { exports: {} }, exports = module.exports;
 
-  !function (name, definition) {
-    if (typeof define == 'function') define(definition)
-    else if (typeof module != 'undefined') module.exports = definition()
-    else this[name] = this['domReady'] = definition()
-  }('domready', function (ready) {
-  
-    var fns = [], fn, f = false
-      , doc = document
-      , testEl = doc.documentElement
-      , hack = testEl.doScroll
-      , domContentLoaded = 'DOMContentLoaded'
-      , addEventListener = 'addEventListener'
-      , onreadystatechange = 'onreadystatechange'
-      , loaded = /^loade|c/.test(doc.readyState)
-  
-    function flush(f) {
-      loaded = 1
-      while (f = fns.shift()) f()
-    }
-  
-    doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function () {
-      doc.removeEventListener(domContentLoaded, fn, f)
-      flush()
-    }, f)
-  
-  
-    hack && doc.attachEvent(onreadystatechange, (fn = function () {
-      if (/^c/.test(doc.readyState)) {
-        doc.detachEvent(onreadystatechange, fn)
-        flush()
-      }
-    }))
-  
-    return (ready = hack ?
-      function (fn) {
-        self != top ?
-          loaded ? fn() : fns.push(fn) :
-          function () {
-            try {
-              testEl.doScroll('left')
-            } catch (e) {
-              return setTimeout(function() { ready(fn) }, 50)
-            }
-            fn()
-          }()
-      } :
-      function (fn) {
-        loaded ? fn() : fns.push(fn)
-      })
-  })
-
-  provide("domready", module.exports);
-
-  !function ($) {
-    var ready = require('domready')
-    $.ender({domReady: ready})
-    $.ender({
-      ready: function (f) {
-        ready(f)
-        return this
-      }
-    }, true)
-  }(ender);
-
-}();
-
-!function () {
-
-  var module = { exports: {} }, exports = module.exports;
-
   /*!
    * Sizzle CSS Selector Engine
    *  Copyright 2011, The Dojo Foundation
@@ -173,11 +103,13 @@
   (function(){
   
   var chunker = /((?:\((?:\([^()]+\)|[^()]+)+\)|\[(?:\[[^\[\]]*\]|['"][^'"]*['"]|[^\[\]'"]+)+\]|\\.|[^ >+~,(\[\\]+)+|[>+~])(\s*,\s*)?((?:.|\r|\n)*)/g,
+  	expando = "sizcache" + (Math.random() + '').replace('.', ''),
   	done = 0,
   	toString = Object.prototype.toString,
   	hasDuplicate = false,
   	baseHasDuplicate = true,
   	rBackslash = /\\/g,
+  	rReturn = /\r\n/g,
   	rNonWord = /\W/;
   
   // Here we check if the JavaScript engine is using some sort of
@@ -229,7 +161,7 @@
   	if ( parts.length > 1 && origPOS.exec( selector ) ) {
   
   		if ( parts.length === 2 && Expr.relative[ parts[0] ] ) {
-  			set = posProcess( parts[0] + parts[1], context );
+  			set = posProcess( parts[0] + parts[1], context, seed );
   
   		} else {
   			set = Expr.relative[ parts[0] ] ?
@@ -243,7 +175,7 @@
   					selector += parts.shift();
   				}
   
-  				set = posProcess( selector, set );
+  				set = posProcess( selector, set, seed );
   			}
   		}
   
@@ -362,18 +294,17 @@
   };
   
   Sizzle.find = function( expr, context, isXML ) {
-  	var set;
+  	var set, i, len, match, type, left;
   
   	if ( !expr ) {
   		return [];
   	}
   
-  	for ( var i = 0, l = Expr.order.length; i < l; i++ ) {
-  		var match,
-  			type = Expr.order[i];
+  	for ( i = 0, len = Expr.order.length; i < len; i++ ) {
+  		type = Expr.order[i];
   
   		if ( (match = Expr.leftMatch[ type ].exec( expr )) ) {
-  			var left = match[1];
+  			left = match[1];
   			match.splice( 1, 1 );
   
   			if ( left.substr( left.length - 1 ) !== "\\" ) {
@@ -399,17 +330,18 @@
   
   Sizzle.filter = function( expr, set, inplace, not ) {
   	var match, anyFound,
+  		type, found, item, filter, left,
+  		i, pass,
   		old = expr,
   		result = [],
   		curLoop = set,
   		isXMLFilter = set && set[0] && Sizzle.isXML( set[0] );
   
   	while ( expr && set.length ) {
-  		for ( var type in Expr.filter ) {
+  		for ( type in Expr.filter ) {
   			if ( (match = Expr.leftMatch[ type ].exec( expr )) != null && match[2] ) {
-  				var found, item,
-  					filter = Expr.filter[ type ],
-  					left = match[1];
+  				filter = Expr.filter[ type ];
+  				left = match[1];
   
   				anyFound = false;
   
@@ -435,10 +367,10 @@
   				}
   
   				if ( match ) {
-  					for ( var i = 0; (item = curLoop[i]) != null; i++ ) {
+  					for ( i = 0; (item = curLoop[i]) != null; i++ ) {
   						if ( item ) {
   							found = filter( item, match, i, curLoop );
-  							var pass = not ^ !!found;
+  							pass = not ^ found;
   
   							if ( inplace && found != null ) {
   								if ( pass ) {
@@ -489,7 +421,46 @@
   };
   
   Sizzle.error = function( msg ) {
-  	throw "Syntax error, unrecognized expression: " + msg;
+  	throw new Error( "Syntax error, unrecognized expression: " + msg );
+  };
+  
+  /**
+   * Utility function for retreiving the text value of an array of DOM nodes
+   * @param {Array|Element} elem
+   */
+  var getText = Sizzle.getText = function( elem ) {
+      var i, node,
+  		nodeType = elem.nodeType,
+  		ret = "";
+  
+  	if ( nodeType ) {
+  		if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
+  			// Use textContent || innerText for elements
+  			if ( typeof elem.textContent === 'string' ) {
+  				return elem.textContent;
+  			} else if ( typeof elem.innerText === 'string' ) {
+  				// Replace IE's carriage returns
+  				return elem.innerText.replace( rReturn, '' );
+  			} else {
+  				// Traverse it's children
+  				for ( elem = elem.firstChild; elem; elem = elem.nextSibling) {
+  					ret += getText( elem );
+  				}
+  			}
+  		} else if ( nodeType === 3 || nodeType === 4 ) {
+  			return elem.nodeValue;
+  		}
+  	} else {
+  
+  		// If no nodeType, this is expected to be an array
+  		for ( i = 0; (node = elem[i]); i++ ) {
+  			// Do not traverse comment nodes
+  			if ( node.nodeType !== 8 ) {
+  				ret += getText( node );
+  			}
+  		}
+  	}
+  	return ret;
   };
   
   var Expr = Sizzle.selectors = {
@@ -879,7 +850,7 @@
   				return filter( elem, i, match, array );
   
   			} else if ( name === "contains" ) {
-  				return (elem.textContent || elem.innerText || Sizzle.getText([ elem ]) || "").indexOf(match[3]) >= 0;
+  				return (elem.textContent || elem.innerText || getText([ elem ]) || "").indexOf(match[3]) >= 0;
   
   			} else if ( name === "not" ) {
   				var not = match[3];
@@ -898,13 +869,16 @@
   		},
   
   		CHILD: function( elem, match ) {
-  			var type = match[1],
+  			var first, last,
+  				doneName, parent, cache,
+  				count, diff,
+  				type = match[1],
   				node = elem;
   
   			switch ( type ) {
   				case "only":
   				case "first":
-  					while ( (node = node.previousSibling) )	 {
+  					while ( (node = node.previousSibling) ) {
   						if ( node.nodeType === 1 ) {
   							return false;
   						}
@@ -916,8 +890,9 @@
   
   					node = elem;
   
+  					/* falls through */
   				case "last":
-  					while ( (node = node.nextSibling) )	 {
+  					while ( (node = node.nextSibling) ) {
   						if ( node.nodeType === 1 ) {
   							return false;
   						}
@@ -926,18 +901,18 @@
   					return true;
   
   				case "nth":
-  					var first = match[2],
-  						last = match[3];
+  					first = match[2];
+  					last = match[3];
   
   					if ( first === 1 && last === 0 ) {
   						return true;
   					}
   
-  					var doneName = match[0],
-  						parent = elem.parentNode;
+  					doneName = match[0];
+  					parent = elem.parentNode;
   
-  					if ( parent && (parent.sizcache !== doneName || !elem.nodeIndex) ) {
-  						var count = 0;
+  					if ( parent && (parent[ expando ] !== doneName || !elem.nodeIndex) ) {
+  						count = 0;
   
   						for ( node = parent.firstChild; node; node = node.nextSibling ) {
   							if ( node.nodeType === 1 ) {
@@ -945,10 +920,10 @@
   							}
   						}
   
-  						parent.sizcache = doneName;
+  						parent[ expando ] = doneName;
   					}
   
-  					var diff = elem.nodeIndex - last;
+  					diff = elem.nodeIndex - last;
   
   					if ( first === 0 ) {
   						return diff === 0;
@@ -964,7 +939,7 @@
   		},
   
   		TAG: function( elem, match ) {
-  			return (match === "*" && elem.nodeType === 1) || elem.nodeName.toLowerCase() === match;
+  			return (match === "*" && elem.nodeType === 1) || !!elem.nodeName && elem.nodeName.toLowerCase() === match;
   		},
   
   		CLASS: function( elem, match ) {
@@ -974,7 +949,9 @@
   
   		ATTR: function( elem, match ) {
   			var name = match[1],
-  				result = Expr.attrHandle[ name ] ?
+  				result = Sizzle.attr ?
+  					Sizzle.attr( elem, name ) :
+  					Expr.attrHandle[ name ] ?
   					Expr.attrHandle[ name ]( elem ) :
   					elem[ name ] != null ?
   						elem[ name ] :
@@ -985,6 +962,8 @@
   
   			return result == null ?
   				type === "!=" :
+  				!type && Sizzle.attr ?
+  				result != null :
   				type === "=" ?
   				value === check :
   				type === "*=" ?
@@ -1024,6 +1003,9 @@
   	Expr.match[ type ] = new RegExp( Expr.match[ type ].source + (/(?![^\[]*\])(?![^\(]*\))/.source) );
   	Expr.leftMatch[ type ] = new RegExp( /(^(?:.|\r|\n)*?)/.source + Expr.match[ type ].source.replace(/\\(\d+)/g, fescape) );
   }
+  // Expose origPOS
+  // "global" as in regardless of relation to brackets/parens
+  Expr.match.globalPOS = origPOS;
   
   var makeArray = function( array, results ) {
   	array = Array.prototype.slice.call( array, 0 );
@@ -1164,26 +1146,6 @@
   		return 1;
   	};
   }
-  
-  // Utility function for retreiving the text value of an array of DOM nodes
-  Sizzle.getText = function( elems ) {
-  	var ret = "", elem;
-  
-  	for ( var i = 0; elems[i]; i++ ) {
-  		elem = elems[i];
-  
-  		// Get the text from text nodes and CDATA nodes
-  		if ( elem.nodeType === 3 || elem.nodeType === 4 ) {
-  			ret += elem.nodeValue;
-  
-  		// Traverse everything else, except comment nodes
-  		} else if ( elem.nodeType !== 8 ) {
-  			ret += Sizzle.getText( elem.childNodes );
-  		}
-  	}
-  
-  	return ret;
-  };
   
   // Check to see if the browser returns elements by name when
   // querying by getElementById (and provide a workaround)
@@ -1462,13 +1424,13 @@
   			elem = elem[dir];
   
   			while ( elem ) {
-  				if ( elem.sizcache === doneName ) {
+  				if ( elem[ expando ] === doneName ) {
   					match = checkSet[elem.sizset];
   					break;
   				}
   
   				if ( elem.nodeType === 1 && !isXML ){
-  					elem.sizcache = doneName;
+  					elem[ expando ] = doneName;
   					elem.sizset = i;
   				}
   
@@ -1495,14 +1457,14 @@
   			elem = elem[dir];
   
   			while ( elem ) {
-  				if ( elem.sizcache === doneName ) {
+  				if ( elem[ expando ] === doneName ) {
   					match = checkSet[elem.sizset];
   					break;
   				}
   
   				if ( elem.nodeType === 1 ) {
   					if ( !isXML ) {
-  						elem.sizcache = doneName;
+  						elem[ expando ] = doneName;
   						elem.sizset = i;
   					}
   
@@ -1550,7 +1512,7 @@
   	return documentElement ? documentElement.nodeName !== "HTML" : false;
   };
   
-  var posProcess = function( selector, context ) {
+  var posProcess = function( selector, context, seed ) {
   	var match,
   		tmpSet = [],
   		later = "",
@@ -1566,61 +1528,125 @@
   	selector = Expr.relative[selector] ? selector + "*" : selector;
   
   	for ( var i = 0, l = root.length; i < l; i++ ) {
-  		Sizzle( selector, root[i], tmpSet );
+  		Sizzle( selector, root[i], tmpSet, seed );
   	}
   
   	return Sizzle.filter( later, tmpSet );
   };
   
   // EXPOSE
+  
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = Sizzle;
   } else {
     window.Sizzle = Sizzle;
   }
   
-  
   })();
   
 
   provide("sizzle", module.exports);
 
-  !function (doc) {
-    var Sizzle = require('sizzle')
-    var table = 'table',
-        nodeMap = {
-          thead: table,
-          tbody: table,
-          tfoot: table,
-          tr: 'tbody',
-          th: 'tr',
-          td: 'tr',
-          fieldset: 'form',
-          option: 'select'
+  !function (doc, html, $) {
+    // A bunch of this code is borrowed from Qwery so Sizzle acts as a drop-in replacement
+    // and can handle the same argument types for $() as Qwery.
+    // Similar code can be found in NWMatcher's bridge
+    var sizzle = require('sizzle')
+      , isNode = function (el, t) {
+          return el && typeof el === 'object' && (t = el.nodeType) && (t == 1 || t == 9)
+        }
+      , arrayLike = function (o) {
+          return (typeof o === 'object' && isFinite(o.length))
+        }
+      , flatten = function (ar) {
+          for (var r = [], i = 0, l = ar.length; i < l; ++i) arrayLike(ar[i]) ? (r = r.concat(ar[i])) : (r[r.length] = ar[i])
+          return r
+        }
+      , uniq = function (ar) {
+          var a = [], i, j
+          o: for (i = 0; i < ar.length; ++i) {
+            for (j = 0; j < a.length; ++j) {
+              if (a[j] == ar[i]) continue o
+            }
+            a[a.length] = ar[i]
+          }
+          return a
+        }
+      , normalizeRoot = function (root) {
+          if (!root) return doc
+          if (typeof root == 'string') return sizzle(root)[0]
+          if (!root.nodeType && arrayLike(root)) return root[0]
+          return root
+        }
+      , isAncestor = 'compareDocumentPosition' in html ?
+          function (element, container) {
+            return (container.compareDocumentPosition(element) & 16) == 16
+          } : 'contains' in html ?
+          function (element, container) {
+            container = container.nodeType === 9 || container == window ? html : container
+            return container !== element && container.contains(element)
+          } :
+          function (element, container) {
+            while (element = element.parentNode) if (element === container) return 1
+            return 0
+          }
+      , select = function (selector, _root) {
+          var root = normalizeRoot(_root)
+          if (!root || !selector) return []
+          if (selector === window || isNode(selector)) {
+            return !_root || (selector !== window && isNode(root) && isAncestor(root, container)) ? [selector] : []
+          }
+          if (selector && arrayLike(selector)) return flatten(selector)
+          return sizzle(selector, root)
+        }
+      , is = function (s) {
+          var i, l
+          for (i = 0, l = this.length; i < l; i++) {
+            if (sizzle.matchesSelector(this[i], s))
+              return true
+          }
+          return false
         }
   
-    function create(node, root) {
-      var tag = /^<([^\s>]+)/.exec(node)[1]
-      var el = (root || doc).createElement(nodeMap[tag] || 'div'), els = [];
-      el.innerHTML = node;
-      var nodes = el.childNodes;
-      el = el.firstChild;
-      els.push(el);
-      while (el = el.nextSibling) {
-        (el.nodeType == 1) && els.push(el);
-      }
-      return els;
+    $._select = function (selector, root) {
+      // if 'bonzo' is available at run-time use it for <element> creation
+      return ($._select = (function(bonzo) {
+        try {
+          bonzo = require('bonzo')
+          return function (selector, root) {
+            return /^\s*</.test(selector) ? bonzo.create(selector, root) : select(selector, root)
+          }
+        } catch (e) { }
+        return select
+      })())(selector, root)
     }
-    $._select = function (s, r) {
-      return /^\s*</.test(s) ? create(s, r) : Sizzle(s, r);
-    };
   
     $.ender({
-      find: function (s) {
-        return $(Sizzle(s, this[0]));
-      }
-    }, true);
-  }(document);
+        // boolean, does at least one element in the collection match the given selector
+        is: is
+      , matchesSelector: is
+        // find all elements that are children of the elements in this collection matching
+        // the given selector
+      , find: function (s) {
+          var r = [], i = 0, l = this.length
+          for (; i < l; i++)
+            r = r.concat(select(s, this[i]))
+          return $(uniq(r))
+        }
+        // add additional elements to this collection matching the given selector
+      , and: function (s, r) {
+          var plus = select(s, r)
+            , i = this.length
+            , l = this.length + plus.length
+            , j = 0
+          for (; i < l; i++, j++)
+            this[i] = plus[j]
+          return $(uniq(this))
+        }
+    }, true)
+  
+  }(document, document.documentElement, ender)
+  
 
 }();
 
@@ -2545,6 +2571,76 @@
 
   var module = { exports: {} }, exports = module.exports;
 
+  !function (name, definition) {
+    if (typeof define == 'function') define(definition)
+    else if (typeof module != 'undefined') module.exports = definition()
+    else this[name] = this['domReady'] = definition()
+  }('domready', function (ready) {
+  
+    var fns = [], fn, f = false
+      , doc = document
+      , testEl = doc.documentElement
+      , hack = testEl.doScroll
+      , domContentLoaded = 'DOMContentLoaded'
+      , addEventListener = 'addEventListener'
+      , onreadystatechange = 'onreadystatechange'
+      , loaded = /^loade|c/.test(doc.readyState)
+  
+    function flush(f) {
+      loaded = 1
+      while (f = fns.shift()) f()
+    }
+  
+    doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function () {
+      doc.removeEventListener(domContentLoaded, fn, f)
+      flush()
+    }, f)
+  
+  
+    hack && doc.attachEvent(onreadystatechange, (fn = function () {
+      if (/^c/.test(doc.readyState)) {
+        doc.detachEvent(onreadystatechange, fn)
+        flush()
+      }
+    }))
+  
+    return (ready = hack ?
+      function (fn) {
+        self != top ?
+          loaded ? fn() : fns.push(fn) :
+          function () {
+            try {
+              testEl.doScroll('left')
+            } catch (e) {
+              return setTimeout(function() { ready(fn) }, 50)
+            }
+            fn()
+          }()
+      } :
+      function (fn) {
+        loaded ? fn() : fns.push(fn)
+      })
+  })
+
+  provide("domready", module.exports);
+
+  !function ($) {
+    var ready = require('domready')
+    $.ender({domReady: ready})
+    $.ender({
+      ready: function (f) {
+        ready(f)
+        return this
+      }
+    }, true)
+  }(ender);
+
+}();
+
+!function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
   /**************************************************************
     * Traversty: DOM Traversal Utility (c) Rod Vagg (@rvagg) 2011
     * https://github.com/rvagg/traversty
@@ -2797,12 +2893,21 @@
             }
           return function(selector, index) { return fn(this, selector, index) }
         }
+      , up = integrate('up')
+      , down = integrate('down')
+      , next = integrate('next')
+      , previous = integrate('previous')
+  
     $.ender(
         {
-            up: integrate('up')
-          , down: integrate('down')
-          , next: integrate('next')
-          , previous: integrate('previous')
+            // core
+            up: up
+          , down: down
+          , next: next
+          , previous: previous
+            // aliases
+          , parent: up
+          , prev: previous
         }
       , true
     )
