@@ -175,7 +175,6 @@
     else this[name] = definition()
   }('bonzo', function() {
     var context = this
-      , old = context.bonzo
       , win = window
       , doc = win.document
       , html = doc.documentElement
@@ -197,6 +196,7 @@
           , optgroup: option }
       , stateAttributes = /^checked|selected$/
       , ie = /msie/i.test(navigator.userAgent)
+      , hasClass, addClass, removeClass
       , uidMap = {}
       , uuids = 0
       , digit = /^-?[\d\.]+$/
@@ -210,15 +210,16 @@
           e.innerHTML = '<a href="#x">x</a><table style="float:left;"></table>'
           return {
             hrefExtended: e[byTag]('a')[0][getAttribute]('href') != '#x' // IE < 8
-            , autoTbody: e[byTag]('tbody').length !== 0 // IE < 8
-            , computedStyle: doc.defaultView && doc.defaultView.getComputedStyle
-            , cssFloat: e[byTag]('table')[0].style.styleFloat ? 'styleFloat' : 'cssFloat'
-            , transform: function () {
-                var props = ['webkitTransform', 'MozTransform', 'OTransform', 'msTransform', 'Transform'], i
-                for (i = 0; i < props.length; i++) {
-                  if (props[i] in e.style) return props[i]
-                }
-              }()
+          , autoTbody: e[byTag]('tbody').length !== 0 // IE < 8
+          , computedStyle: doc.defaultView && doc.defaultView.getComputedStyle
+          , cssFloat: e[byTag]('table')[0].style.styleFloat ? 'styleFloat' : 'cssFloat'
+          , transform: function () {
+              var props = ['webkitTransform', 'MozTransform', 'OTransform', 'msTransform', 'Transform'], i
+              for (i = 0; i < props.length; i++) {
+                if (props[i] in e.style) return props[i]
+              }
+            }()
+          , classList: 'classList' in e
           }
         }()
       , trimReplace = /(^\s*|\s*$)/g
@@ -243,11 +244,11 @@
     function deepEach(ar, fn, scope) {
       for (var i = 0, l = ar.length; i < l; i++) {
         if (isNode(ar[i])) {
-          deepEach(ar[i].childNodes, fn, scope);
-          fn.call(scope || ar[i], ar[i], i, ar);
+          deepEach(ar[i].childNodes, fn, scope)
+          fn.call(scope || ar[i], ar[i], i, ar)
         }
       }
-      return ar;
+      return ar
     }
   
     function camelize(s) {
@@ -375,23 +376,34 @@
   
     }
   
-    function hasClass(el, c) {
-      return classReg(c).test(el.className)
+    // classList support for class management
+    // altho to be fair, the api sucks because it won't accept multiple classes at once,
+    // so we have to iterate. bullshit
+    if (features.classList) {
+      hasClass = function (el, c) {
+        return some(c.toString().split(' '), function (c) {
+          return el.classList.contains(c)
+        })
+      }
+      addClass = function (el, c) {
+        each(c.toString().split(' '), function (c) {
+          el.classList.add(c)
+        })
+      }
+      removeClass = function (el, c) { el.classList.remove(c) }
     }
-    function addClass(el, c) {
-      el.className = trim(el.className + ' ' + c)
+    else {
+      hasClass = function (el, c) { return classReg(c).test(el.className) }
+      addClass = function (el, c) { el.className = trim(el.className + ' ' + c) }
+      removeClass = function (el, c) { el.className = trim(el.className.replace(classReg(c), ' ')) }
     }
-    function removeClass(el, c) {
-      el.className = trim(el.className.replace(classReg(c), ' '))
-    }
+  
   
     // this allows method calling for setting values
     // example:
-  
     // bonzo(elements).css('color', function (el) {
     //   return el.getAttribute('data-original-color')
     // })
-  
     function setter(el, v) {
       return typeof v == 'function' ? v(el) : v
     }
@@ -413,10 +425,12 @@
   
     Bonzo.prototype = {
   
+        // indexr method, because jQueriers want this method
         get: function (index) {
-          return this[index]
+          return this[index] || null
         }
   
+        // itetators
       , each: function (fn, scope) {
           return each(this, fn, scope)
         }
@@ -434,14 +448,7 @@
           return m
         }
   
-      , first: function () {
-          return bonzo(this.length ? this[0] : [])
-        }
-  
-      , last: function () {
-          return bonzo(this.length ? this[this.length - 1] : [])
-        }
-  
+      // text and html inserters!
       , html: function (h, text) {
           var method = text ?
             html.textContent === undefined ?
@@ -457,7 +464,10 @@
               this.empty().each(function (el) {
                 !text && (m = el.tagName.match(specialTags)) ?
                   append(el, m[0]) :
-                  (el[method] = h)
+                  !function() {
+                    try { (el[method] = h) }
+                    catch(e) { append(el) }
+                  }();
               }) :
             this[0] ? this[0][method] : ''
         }
@@ -466,44 +476,7 @@
           return this.html(text, 1)
         }
   
-      , addClass: function (c) {
-          return this.each(function (el) {
-            hasClass(el, setter(el, c)) || addClass(el, setter(el, c))
-          })
-        }
-  
-      , removeClass: function (c) {
-          return this.each(function (el) {
-            hasClass(el, setter(el, c)) && removeClass(el, setter(el, c))
-          })
-        }
-  
-      , hasClass: function (c) {
-          return some(this, function (el) {
-            return hasClass(el, c)
-          })
-        }
-  
-      , toggleClass: function (c, condition) {
-          return this.each(function (el) {
-            typeof condition !== 'undefined' ?
-              condition ? addClass(el, c) : removeClass(el, c) :
-              hasClass(el, c) ? removeClass(el, c) : addClass(el, c)
-          })
-        }
-  
-      , show: function (type) {
-          return this.each(function (el) {
-            el.style.display = type || ''
-          })
-        }
-  
-      , hide: function () {
-          return this.each(function (el) {
-            el.style.display = 'none'
-          })
-        }
-  
+        // more related insertion methods
       , append: function (node) {
           return this.each(function (el) {
             each(normalize(node), function (i) {
@@ -531,29 +504,6 @@
           return insert.call(this, target, host, function (t, el) {
             t.insertBefore(el, t.firstChild)
           })
-        }
-  
-      , next: function () {
-          return this.related('nextSibling')
-        }
-  
-      , previous: function () {
-          return this.related('previousSibling')
-        }
-  
-      , related: function (method) {
-          return this.map(
-            function (el) {
-              el = el[method]
-              while (el && el.nodeType !== 1) {
-                el = el[method]
-              }
-              return el || 0
-            },
-            function (el) {
-              return el
-            }
-          )
         }
   
       , before: function (node) {
@@ -598,10 +548,93 @@
           })
         }
   
-      , focus: function () {
+        // class management
+      , addClass: function (c) {
           return this.each(function (el) {
-            el.focus()
+            hasClass(el, setter(el, c)) || addClass(el, setter(el, c))
           })
+        }
+  
+      , removeClass: function (c) {
+          return this.each(function (el) {
+            hasClass(el, setter(el, c)) && removeClass(el, setter(el, c))
+          })
+        }
+  
+      , hasClass: function (c) {
+          return some(this, function (el) {
+            return hasClass(el, c)
+          })
+        }
+  
+      , toggleClass: function (c, condition) {
+          return this.each(function (el) {
+            typeof condition !== 'undefined' ?
+              condition ? addClass(el, c) : removeClass(el, c) :
+              hasClass(el, c) ? removeClass(el, c) : addClass(el, c)
+          })
+        }
+  
+        // display togglers
+      , show: function (type) {
+          return this.each(function (el) {
+            el.style.display = type || ''
+          })
+        }
+  
+      , hide: function () {
+          return this.each(function (el) {
+            el.style.display = 'none'
+          })
+        }
+  
+      , toggle: function (callback, type) {
+          this.each(function (el) {
+            el.style.display = (el.offsetWidth || el.offsetHeight) ? 'none' : type || ''
+          })
+          callback && callback()
+          return this
+        }
+  
+        // DOM Walkers & getters
+      , first: function () {
+          return bonzo(this.length ? this[0] : [])
+        }
+  
+      , last: function () {
+          return bonzo(this.length ? this[this.length - 1] : [])
+        }
+  
+      , next: function () {
+          return this.related('nextSibling')
+        }
+  
+      , previous: function () {
+          return this.related('previousSibling')
+        }
+  
+      , parent: function() {
+        return this.related('parentNode')
+      }
+  
+      , related: function (method) {
+          return this.map(
+            function (el) {
+              el = el[method]
+              while (el && el.nodeType !== 1) {
+                el = el[method]
+              }
+              return el || 0
+            },
+            function (el) {
+              return el
+            }
+          )
+        }
+  
+        // meh. use with care. the ones in Bean are better
+      , focus: function () {
+          return this.length > 0 ? this[0].focus() : null
         }
   
       , blur: function () {
@@ -610,6 +643,7 @@
           })
         }
   
+        // style getter setter & related methods
       , css: function (o, v, p) {
           // is this a request for just getting a style?
           if (v === undefined && typeof o == 'string') {
@@ -708,6 +742,7 @@
           }
         }
   
+        // attributes are hard. go shopping
       , attr: function (k, v) {
           var el = this[0]
           if (typeof k != 'string' && !(k instanceof String)) {
@@ -726,16 +761,18 @@
             })
         }
   
-      , val: function (s) {
-          return (typeof s == 'string') ? this.attr('value', s) : this[0].value
-        }
-  
       , removeAttr: function (k) {
           return this.each(function (el) {
             stateAttributes.test(k) ? (el[k] = false) : el.removeAttribute(k)
           })
         }
   
+      , val: function (s) {
+          return (typeof s == 'string') ? this.attr('value', s) : this[0].value
+        }
+  
+        // use with care and knowledge. this data() method uses data attributes on the DOM nodes
+        // to do this differently costs a lot more code. c'est la vie
       , data: function (k, v) {
           var el = this[0], uid, o, m
           if (typeof v === 'undefined') {
@@ -754,6 +791,7 @@
           }
         }
   
+        // DOM detachment & related
       , remove: function () {
           this.deepEach(clearData)
   
@@ -778,6 +816,7 @@
           })
         }
   
+        // who uses a mouse anyway? oh right.
       , scrollTop: function (y) {
           return scroll.call(this, null, y, 'y')
         }
@@ -786,13 +825,6 @@
           return scroll.call(this, x, null, 'x')
         }
   
-      , toggle: function (callback, type) {
-          this.each(function (el) {
-            el.style.display = (el.offsetWidth || el.offsetHeight) ? 'none' : type || ''
-          })
-          callback && callback()
-          return this
-        }
     }
   
     function normalize(node) {
@@ -831,12 +863,14 @@
     }
   
     bonzo.aug = function (o, target) {
+      // for those standalone bonzo users. this love is for you.
       for (var k in o) {
         o.hasOwnProperty(k) && ((target || Bonzo.prototype)[k] = o[k])
       }
     }
   
     bonzo.create = function (node) {
+      // hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
       return typeof node == 'string' && node !== '' ?
         function () {
           var tag = /^\s*<([^\s>]+)/.exec(node)
@@ -902,11 +936,6 @@
         return false
       }
   
-    bonzo.noConflict = function () {
-      context.bonzo = old
-      return this
-    }
-  
     return bonzo
   })
   
@@ -961,45 +990,49 @@
           }
         }
         return $(uniq(r))
-      },
+      }
   
-      closest: function (selector) {
+    , parent: function() {
+        return $(uniq(b(this).parent()))
+      }
+  
+    , closest: function (selector) {
         return this.parents(selector, true)
-      },
+      }
   
-      first: function () {
+    , first: function () {
         return $(this.length ? this[0] : this)
-      },
+      }
   
-      last: function () {
+    , last: function () {
         return $(this.length ? this[this.length - 1] : [])
-      },
+      }
   
-      next: function () {
+    , next: function () {
         return $(b(this).next())
-      },
+      }
   
-      previous: function () {
+    , previous: function () {
         return $(b(this).previous())
-      },
+      }
   
-      appendTo: function (t) {
+    , appendTo: function (t) {
         return b(this.selector).appendTo(t, this)
-      },
+      }
   
-      prependTo: function (t) {
+    , prependTo: function (t) {
         return b(this.selector).prependTo(t, this)
-      },
+      }
   
-      insertAfter: function (t) {
+    , insertAfter: function (t) {
         return b(this.selector).insertAfter(t, this)
-      },
+      }
   
-      insertBefore: function (t) {
+    , insertBefore: function (t) {
         return b(this.selector).insertBefore(t, this)
-      },
+      }
   
-      siblings: function () {
+    , siblings: function () {
         var i, l, p, r = []
         for (i = 0, l = this.length; i < l; i++) {
           p = this[i]
@@ -1008,9 +1041,9 @@
           while (p = p.nextSibling) p.nodeType == 1 && r.push(p)
         }
         return $(r)
-      },
+      }
   
-      children: function () {
+    , children: function () {
         var i, el, r = []
         for (i = 0, l = this.length; i < l; i++) {
           if (!(el = b.firstChild(this[i]))) continue;
@@ -1018,13 +1051,13 @@
           while (el = el.nextSibling) el.nodeType == 1 && r.push(el)
         }
         return $(uniq(r))
-      },
+      }
   
-      height: function (v) {
+    , height: function (v) {
         return dimension(v, this, 'height')
-      },
+      }
   
-      width: function (v) {
+    , width: function (v) {
         return dimension(v, this, 'width')
       }
     }, true)
@@ -1048,13 +1081,12 @@
 
   var module = { exports: {} }, exports = module.exports;
 
-  /*!
+  /**************************************************************
     * Traversty: DOM Traversal Utility (c) Rod Vagg (@rvagg) 2011
     * https://github.com/rvagg/traversty
-    * License MIT
+    * License: MIT
     */
   
-  /*global module:true, define:true*/
   !(function (name, definition) {
     if (typeof module !== 'undefined') module.exports = definition()
     else if (typeof define === 'function' && define.amd) define(name, definition)
@@ -1080,6 +1112,10 @@
   
       , isString = function (o) {
           return toString.call(o) === '[object String]'
+        }
+  
+      , isFunction = function (o) {
+          return toString.call(o) === '[object Function]'
         }
   
       , isUndefined = function (o) {
@@ -1223,19 +1259,19 @@
             try {
               // check to see how we do a matchesSelector
               _selectorMatches =
-                s.matching ? function (selector, el) { return s.matching([el], selector).length > 0 } :
-                  s.is ? function (selector, el) { return s.is(el, selector) } :
-                    s.matchesSelector ? function (selector, el) { return s.matchesSelector(el, selector) } :
-                      s.match ? function (selector, el) { return s.match(el, selector) } : null
+                isFunction(s.matching) ? function (selector, el) { return s.matching([el], selector).length > 0 } :
+                  isFunction(s.is) ? function (selector, el) { return s.is(el, selector) } :
+                    isFunction(s.matchesSelector) ? function (selector, el) { return s.matchesSelector(el, selector) } :
+                      isFunction(s.match) ? function (selector, el) { return s.match(el, selector) } : null
   
               if (!_selectorMatches) {
                 // perhaps it's an selector(x).is(y) type selector?
                 ss = s('a', e)
                 _selectorMatches =
-                  ss.matching ? function (selector, el) { return s(el).matching(selector).length > 0 } :
-                    ss.is ? function (selector, el) { return s(el).is(selector) } :
-                      ss.matchesSelector ? function (selector, el) { return s(el).matchesSelector(selector) } :
-                        ss.match ? function (selector, el) { return s(el).match(selector) } : null
+                  isFunction(ss.matching) ? function (selector, el) { return s(el).matching(selector).length > 0 } :
+                    isFunction(ss.is) ? function (selector, el) { return s(el).is(selector) } :
+                      isFunction(ss.matchesSelector) ? function (selector, el) { return s(el).matchesSelector(selector) } :
+                        isFunction(ss.match) ? function (selector, el) { return s(el).match(selector) } : null
               }
   
               if (!_selectorMatches)
@@ -1297,12 +1333,21 @@
             }
           return function(selector, index) { return fn(this, selector, index) }
         }
+      , up = integrate('up')
+      , down = integrate('down')
+      , next = integrate('next')
+      , previous = integrate('previous')
+  
     $.ender(
         {
-            up: integrate('up')
-          , down: integrate('down')
-          , next: integrate('next')
-          , previous: integrate('previous')
+            // core
+            up: up
+          , down: down
+          , next: next
+          , previous: previous
+            // aliases
+          , parent: up
+          , prev: previous
         }
       , true
     )
@@ -1532,7 +1577,7 @@
   (function(sel) {
     /* util.coffee
     */
-    var attrPattern, checkNth, combinatorPattern, combine, contains, create, eachElement, elCmp, evaluate, extend, filter, filterDescendants, find, findRoots, html, name, nextElementSibling, normalizeRoots, nthPattern, outerParents, parentMap, parse, parseSimple, pseudoPattern, qSA, select, selectorGroups, selectorPattern, synonym, tagPattern, takeElements, _attrMap, _positionalPseudos, _ref;
+    var attrPattern, combinatorPattern, combine, contains, create, difference, eachElement, elCmp, evaluate, extend, filter, filterDescendants, find, findRoots, getAttribute, html, intersection, matchesDisconnected, matchesSelector, matching, nextElementSibling, normalizeRoots, outerParents, parentMap, parse, parseSimple, pseudoPattern, pseudos, qSA, select, selectorGroups, selectorPattern, tagPattern, takeElements, union, _attrMap;
     html = document.documentElement;
     extend = function(a, b) {
       var x, _i, _len;
@@ -1548,9 +1593,9 @@
       });
     };
     eachElement = function(el, first, next, fn) {
-      el = el[first];
+      if (first) el = el[first];
       while (el) {
-        if (el.nodeType === 1) fn(el);
+        if (el.nodeType === 1) if (fn(el) === false) break;
         el = el[next];
       }
     };
@@ -1652,21 +1697,21 @@
       }
       return r;
     };
-    sel.union = function(a, b) {
+    sel.union = union = function(a, b) {
       return combine(a, b, true, true, {
         '0': 0,
         '-1': 1,
         '1': 2
       });
     };
-    sel.intersection = function(a, b) {
+    sel.intersection = intersection = function(a, b) {
       return combine(a, b, false, false, {
         '0': 0,
         '-1': -1,
         '1': -2
       });
     };
-    sel.difference = function(a, b) {
+    sel.difference = difference = function(a, b) {
       return combine(a, b, true, false, {
         '0': -1,
         '-1': 1,
@@ -1675,17 +1720,18 @@
     };
     /* parser.coffee
     */
-    attrPattern = /\[\s*([-\w]+)\s*(?:([~|^$*!]?=)\s*(?:([-\w]+)|['"]([^'"]*)['"])\s*)?\]/g;
+    attrPattern = /\[\s*([-\w]+)\s*(?:([~|^$*!]?=)\s*(?:([-\w]+)|['"]([^'"]*)['"]\s*(i))\s*)?\]/g;
     pseudoPattern = /::?([-\w]+)(?:\((\([^()]+\)|[^()]+)\))?/g;
-    combinatorPattern = /^\s*([,+~])/;
-    selectorPattern = RegExp("^(?:\\s*(>))?\\s*(?:(\\*|\\w+))?(?:\\#([-\\w]+))?(?:\\.([-\\.\\w]+))?((?:" + attrPattern.source + ")*)((?:" + pseudoPattern.source + ")*)");
+    combinatorPattern = /^\s*([,+~]|\/([-\w]+)\/)/;
+    selectorPattern = RegExp("^(?:\\s*(>))?\\s*(?:(\\*|\\w+))?(?:\\#([-\\w]+))?(?:\\.([-\\.\\w]+))?((?:" + attrPattern.source + ")*)((?:" + pseudoPattern.source + ")*)(!)?");
     selectorGroups = {
       type: 1,
       tag: 2,
       id: 3,
       classes: 4,
       attrsAll: 5,
-      pseudosAll: 10
+      pseudosAll: 11,
+      subject: 14
     };
     parse = function(selector) {
       var e, last, result;
@@ -1712,8 +1758,9 @@
       var e, group, name;
       if (e = combinatorPattern.exec(selector)) {
         e.compound = true;
-        e.type = e[1];
-      } else if (e = selectorPattern.exec(selector)) {
+        e.type = e[1].charAt(0);
+        if (e.type === '/') e.idref = e[2];
+      } else if ((e = selectorPattern.exec(selector)) && e[0].trim()) {
         e.simple = true;
         for (name in selectorGroups) {
           group = selectorGroups[name];
@@ -1724,7 +1771,7 @@
         if (e.classes) e.classes = e.classes.toLowerCase().split('.');
         if (e.attrsAll) {
           e.attrs = [];
-          e.attrsAll.replace(attrPattern, function(all, name, op, val, quotedVal) {
+          e.attrsAll.replace(attrPattern, function(all, name, op, val, quotedVal, ignoreCase) {
             name = name.toLowerCase();
             val || (val = quotedVal);
             if (op === '=') {
@@ -1740,10 +1787,12 @@
                 return "";
               }
             }
+            if (ignoreCase) val = val.toLowerCase();
             e.attrs.push({
               name: name,
               op: op,
-              val: val
+              val: val,
+              ignoreCase: ignoreCase
             });
             return "";
           });
@@ -1752,14 +1801,10 @@
           e.pseudos = [];
           e.pseudosAll.replace(pseudoPattern, function(all, name, val) {
             name = name.toLowerCase();
-            if (name === 'not') {
-              e.not = parse(val);
-            } else {
-              e.pseudos.push({
-                name: name,
-                val: val
-              });
-            }
+            e.pseudos.push({
+              name: name,
+              val: val
+            });
             return "";
           });
         }
@@ -1778,26 +1823,21 @@
         return el.className;
       }
     };
-    _positionalPseudos = {
-      'nth-child': false,
-      'nth-of-type': false,
-      'first-child': false,
-      'first-of-type': false,
-      'nth-last-child': true,
-      'nth-last-of-type': true,
-      'last-child': true,
-      'last-of-type': true,
-      'only-child': false,
-      'only-of-type': false
+    getAttribute = function(el, name) {
+      if (_attrMap[name]) {
+        return _attrMap[name](el);
+      } else {
+        return el.getAttribute(name);
+      }
     };
-    find = function(e, roots) {
+    find = function(e, roots, matchRoots) {
       var els;
       if (e.id) {
         els = [];
         roots.forEach(function(root) {
           var doc, el;
           doc = root.ownerDocument || root;
-          if (root === doc || contains(doc.documentElement, root)) {
+          if (root === doc || (root.nodeType === 1 && contains(doc.documentElement, root))) {
             el = doc.getElementById(e.id);
             if (el && contains(root, el)) els.push(el);
           } else {
@@ -1808,7 +1848,7 @@
         els = roots.map(function(root) {
           return e.classes.map(function(cls) {
             return root.getElementsByClassName(cls);
-          }).reduce(sel.union);
+          }).reduce(union);
         }).reduce(extend, []);
         e.ignoreClasses = true;
       } else {
@@ -1821,15 +1861,18 @@
         e.ignoreTag = true;
       }
       if (els && els.length) {
-        els = filter(e, els);
+        els = filter(els, e, roots, matchRoots);
       } else {
         els = [];
       }
       e.ignoreTag = void 0;
       e.ignoreClasses = void 0;
+      if (matchRoots) {
+        els = union(els, filter(takeElements(roots), e, roots, matchRoots));
+      }
       return els;
     };
-    filter = function(e, els) {
+    filter = function(els, e, roots, matchRoots) {
       if (e.id) {
         els = els.filter(function(el) {
           return el.id === e.id;
@@ -1849,54 +1892,30 @@
       }
       if (e.attrs) {
         e.attrs.forEach(function(_arg) {
-          var name, op, val;
-          name = _arg.name, op = _arg.op, val = _arg.val;
+          var ignoreCase, name, op, val;
+          name = _arg.name, op = _arg.op, val = _arg.val, ignoreCase = _arg.ignoreCase;
           els = els.filter(function(el) {
             var attr, value;
-            attr = _attrMap[name] ? _attrMap[name](el) : el.getAttribute(name);
+            attr = getAttribute(el, name);
             value = attr + "";
+            if (ignoreCase) value = value.toLowerCase();
             return (attr || (el.attributes && el.attributes[name] && el.attributes[name].specified)) && (!op ? true : op === '=' ? value === val : op === '!=' ? value !== val : op === '*=' ? value.indexOf(val) >= 0 : op === '^=' ? value.indexOf(val) === 0 : op === '$=' ? value.substr(value.length - val.length) === val : op === '~=' ? (" " + value + " ").indexOf(" " + val + " ") >= 0 : op === '|=' ? value === val || (value.indexOf(val) === 0 && value.charAt(val.length) === '-') : false);
           });
         });
       }
       if (e.pseudos) {
         e.pseudos.forEach(function(_arg) {
-          var filtered, first, name, next, pseudo, val;
+          var name, pseudo, val;
           name = _arg.name, val = _arg.val;
-          pseudo = sel.pseudos[name];
+          pseudo = pseudos[name];
           if (!pseudo) throw new Error("no pseudo with name: " + name);
-          if (name in _positionalPseudos) {
-            first = _positionalPseudos[name] ? 'lastChild' : 'firstChild';
-            next = _positionalPseudos[name] ? 'previousSibling' : 'nextSibling';
-            els.forEach(function(el) {
-              var indices, parent;
-              if ((parent = el.parentNode) && parent._sel_children === void 0) {
-                indices = {
-                  '*': 0
-                };
-                eachElement(parent, first, next, function(el) {
-                  el._sel_index = ++indices['*'];
-                  el._sel_indexOfType = indices[el.nodeName] = (indices[el.nodeName] || 0) + 1;
-                });
-                parent._sel_children = indices;
-              }
+          if (pseudo.batch) {
+            els = pseudo(els, val, roots, matchRoots);
+          } else {
+            els = els.filter(function(el) {
+              return pseudo(el, val);
             });
           }
-          filtered = els.filter(function(el) {
-            return pseudo(el, val);
-          });
-          if (name in _positionalPseudos) {
-            els.forEach(function(el) {
-              var parent;
-              if ((parent = el.parentNode) && parent._sel_children !== void 0) {
-                eachElement(parent, first, next, function(el) {
-                  el._sel_index = el._sel_indexOfType = void 0;
-                });
-                parent._sel_children = void 0;
-              }
-            });
-          }
-          els = filtered;
         });
       }
       return els;
@@ -1925,68 +1944,68 @@
     })();
     /* pseudos.coffee
     */
-    nthPattern = /\s*((?:\+|\-)?(\d*))n\s*((?:\+|\-)\s*\d+)?\s*/;
-    checkNth = function(i, val) {
-      var a, b, m;
-      if (!val) {
-        return false;
-      } else if (isFinite(val)) {
-        return i == val;
-      } else if (val === 'even') {
-        return i % 2 === 0;
-      } else if (val === 'odd') {
-        return i % 2 === 1;
-      } else if (m = nthPattern.exec(val)) {
-        a = m[2] ? parseInt(m[1]) : parseInt(m[1] + '1');
-        b = m[3] ? parseInt(m[3].replace(/\s*/, '')) : 0;
-        if (!a) {
-          return i === b;
-        } else {
-          return ((i - b) % a === 0) && ((i - b) / a >= 0);
-        }
-      } else {
-        throw new Error('invalid nth expression');
-      }
-    };
-    sel.pseudos = {
-      'first-child': function(el) {
-        return el._sel_index === 1;
-      },
-      'only-child': function(el) {
-        return el._sel_index === 1 && el.parentNode._sel_children['*'] === 1;
-      },
-      'nth-child': function(el, val) {
-        return checkNth(el._sel_index, val);
-      },
-      'first-of-type': function(el) {
-        return el._sel_indexOfType === 1;
-      },
-      'only-of-type': function(el) {
-        return el._sel_indexOfType === 1 && el.parentNode._sel_children[el.nodeName] === 1;
-      },
-      'nth-of-type': function(el, val) {
-        return checkNth(el._sel_indexOfType, val);
-      },
-      target: function(el) {
-        return el.getAttribute('id') === location.hash.substr(1);
-      },
-      checked: function(el) {
-        return el.checked === true;
-      },
-      enabled: function(el) {
-        return el.disabled === false;
-      },
-      disabled: function(el) {
-        return el.disabled === true;
-      },
+    sel.pseudos = pseudos = {
       selected: function(el) {
         return el.selected === true;
       },
       focus: function(el) {
         return el.ownerDocument.activeElement === el;
       },
+      enabled: function(el) {
+        return el.disabled === false;
+      },
+      checked: function(el) {
+        return el.checked === true;
+      },
+      disabled: function(el) {
+        return el.disabled === true;
+      },
+      root: function(el) {
+        return el.ownerDocument.documentElement === el;
+      },
+      target: function(el) {
+        return el.id === location.hash.substr(1);
+      },
       empty: function(el) {
         return !el.childNodes.length;
+      },
+      dir: function(el, val) {
+        while (el) {
+          if (el.dir) return el.dir === val;
+          el = el.parentNode;
+        }
+        return false;
+      },
+      lang: function(el, val) {
+        var lang;
+        while (el) {
+          if ((lang = el.lang)) {
+            return lang === val || lang.indexOf("" + val + "-") === 0;
+          }
+          el = el.parentNode;
+        }
+        el = select('head meta[http-equiv="Content-Language" i]', el.ownerDocument)[0];
+        if (el) {
+          lang = getAttribute(el, 'content').split(',')[0];
+          return lang === val || lang.indexOf("" + val + "-") === 0;
+        }
+        return false;
+      },
+      'local-link': function(el, val) {
+        var href, i, location;
+        if (!el.href) return false;
+        href = el.href.replace(/#.*?$/, '');
+        location = el.ownerDocument.location.href.replace(/#.*?$/, '');
+        if (val === void 0) {
+          return href === location;
+        } else {
+          href = href.split('/').slice(2);
+          location = location.split('/').slice(2);
+          for (i = 0; i <= val; i += 1) {
+            if (href[i] !== location[i]) return false;
+          }
+          return true;
+        }
       },
       contains: function(el, val) {
         var _ref;
@@ -1999,50 +2018,212 @@
         return select(val, [el]).length === 0;
       }
     };
-    _ref = {
-      'has': 'with',
-      'last-child': 'first-child',
-      'nth-last-child': 'nth-child',
-      'last-of-type': 'first-of-type',
-      'nth-last-of-type': 'nth-of-type'
+    pseudos['has'] = pseudos['with'];
+    pseudos.matches = function(els, val, roots, matchRoots) {
+      return intersection(els, select(val, roots, matchRoots));
     };
-    for (synonym in _ref) {
-      name = _ref[synonym];
-      sel.pseudos[synonym] = sel.pseudos[name];
-    }
+    pseudos.matches.batch = true;
+    pseudos.not = function(els, val, roots, matchRoots) {
+      return difference(els, select(val, roots, matchRoots));
+    };
+    pseudos.not.batch = true;
+    (function() {
+      var checkNth, fn, matchColumn, name, nthMatch, nthMatchPattern, nthPattern, nthPositional, positionalPseudos;
+      nthPattern = /^\s*(even|odd|(?:(\+|\-)?(\d*)(n))?(?:\s*(\+|\-)?\s*(\d+))?)(?:\s+of\s+(.*?))?\s*$/;
+      checkNth = function(i, m) {
+        var a, b;
+        a = parseInt((m[2] || '+') + (m[3] === '' ? (m[4] ? '1' : '0') : m[3]));
+        b = parseInt((m[5] || '+') + (m[6] === '' ? '0' : m[6]));
+        if (m[1] === 'even') {
+          return i % 2 === 0;
+        } else if (m[1] === 'odd') {
+          return i % 2 === 1;
+        } else if (a) {
+          return ((i - b) % a === 0) && ((i - b) / a >= 0);
+        } else if (b) {
+          return i === b;
+        } else {
+          throw new Error('Invalid nth expression');
+        }
+      };
+      matchColumn = function(nth, reversed) {
+        var first, next;
+        first = reversed ? 'lastChild' : 'firstChild';
+        next = reversed ? 'previousSibling' : 'nextSibling';
+        return function(els, val, roots) {
+          var check, m, set;
+          set = [];
+          if (nth) {
+            m = nthPattern.exec(val);
+            check = function(i) {
+              return checkNth(i, m);
+            };
+          }
+          select('table', roots).forEach(function(table) {
+            var col, max, min, tbody, _i, _len, _ref;
+            if (!nth) {
+              col = select(val, [table])[0];
+              min = 0;
+              eachElement(col, 'previousSibling', 'previousSibling', function(col) {
+                return min += parseInt(col.getAttribute('span') || 1);
+              });
+              max = min + parseInt(col.getAttribute('span') || 1);
+              check = function(i) {
+                return (min < i && i <= max);
+              };
+            }
+            _ref = table.tBodies;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              tbody = _ref[_i];
+              eachElement(tbody, 'firstChild', 'nextSibling', function(row) {
+                var i;
+                if (row.tagName.toLowerCase() !== 'tr') return;
+                i = 0;
+                eachElement(row, first, next, function(col) {
+                  var span;
+                  span = parseInt(col.getAttribute('span') || 1);
+                  while (span) {
+                    if (check(++i)) set.push(col);
+                    span--;
+                  }
+                });
+              });
+            }
+          });
+          return intersection(els, set);
+        };
+      };
+      pseudos['column'] = matchColumn(false);
+      pseudos['column'].batch = true;
+      pseudos['nth-column'] = matchColumn(true);
+      pseudos['nth-column'].batch = true;
+      pseudos['nth-last-column'] = matchColumn(true, true);
+      pseudos['nth-last-column'].batch = true;
+      nthMatchPattern = /^(.*?)\s*of\s*(.*)$/;
+      nthMatch = function(reversed) {
+        return function(els, val, roots) {
+          var filtered, len, m, set;
+          m = nthPattern.exec(val);
+          set = select(m[7], roots);
+          len = set.length;
+          set.forEach(function(el, i) {
+            el._sel_index = (reversed ? len - i : i) + 1;
+          });
+          filtered = els.filter(function(el) {
+            return checkNth(el._sel_index, m);
+          });
+          set.forEach(function(el, i) {
+            el._sel_index = void 0;
+          });
+          return filtered;
+        };
+      };
+      pseudos['nth-match'] = nthMatch();
+      pseudos['nth-match'].batch = true;
+      pseudos['nth-last-match'] = nthMatch(true);
+      pseudos['nth-last-match'].batch = true;
+      nthPositional = function(fn, reversed) {
+        var first, next;
+        first = reversed ? 'lastChild' : 'firstChild';
+        next = reversed ? 'previousSibling' : 'nextSibling';
+        return function(els, val) {
+          var filtered, m;
+          if (val) m = nthPattern.exec(val);
+          els.forEach(function(el) {
+            var indices, parent;
+            if ((parent = el.parentNode) && parent._sel_children === void 0) {
+              indices = {
+                '*': 0
+              };
+              eachElement(parent, first, next, function(el) {
+                el._sel_index = ++indices['*'];
+                el._sel_indexOfType = indices[el.nodeName] = (indices[el.nodeName] || 0) + 1;
+              });
+              parent._sel_children = indices;
+            }
+          });
+          filtered = els.filter(function(el) {
+            return fn(el, m);
+          });
+          els.forEach(function(el) {
+            var parent;
+            if ((parent = el.parentNode) && parent._sel_children !== void 0) {
+              eachElement(parent, first, next, function(el) {
+                el._sel_index = el._sel_indexOfType = void 0;
+              });
+              parent._sel_children = void 0;
+            }
+          });
+          return filtered;
+        };
+      };
+      positionalPseudos = {
+        'first-child': function(el) {
+          return el._sel_index === 1;
+        },
+        'only-child': function(el) {
+          return el._sel_index === 1 && el.parentNode._sel_children['*'] === 1;
+        },
+        'nth-child': function(el, m) {
+          return checkNth(el._sel_index, m);
+        },
+        'first-of-type': function(el) {
+          return el._sel_indexOfType === 1;
+        },
+        'only-of-type': function(el) {
+          return el._sel_indexOfType === 1 && el.parentNode._sel_children[el.nodeName] === 1;
+        },
+        'nth-of-type': function(el, m) {
+          return checkNth(el._sel_indexOfType, m);
+        }
+      };
+      for (name in positionalPseudos) {
+        fn = positionalPseudos[name];
+        pseudos[name] = nthPositional(fn);
+        pseudos[name].batch = true;
+        if (name.substr(0, 4) !== 'only') {
+          name = name.replace('first', 'last').replace('nth', 'nth-last');
+          pseudos[name] = nthPositional(fn, true);
+          pseudos[name].batch = true;
+        }
+      }
+    })();
     /* eval.coffee
     */
     evaluate = function(e, roots, matchRoots) {
-      var els, outerRoots, sibs;
+      var els, ids, outerRoots, sibs;
       els = [];
       if (roots.length) {
         switch (e.type) {
           case ' ':
           case '>':
             outerRoots = filterDescendants(roots);
-            els = find(e, outerRoots);
+            els = find(e, outerRoots, matchRoots);
             if (e.type === '>') {
               roots.forEach(function(el) {
                 el._sel_mark = true;
               });
               els = els.filter(function(el) {
-                if ((el = el.parentNode)) return el._sel_mark;
+                if (el.parentNode) return el.parentNode._sel_mark;
               });
               roots.forEach(function(el) {
                 el._sel_mark = void 0;
               });
             }
-            if (e.not) {
-              els = sel.difference(els, find(e.not, outerRoots, matchRoots));
+            if (e.child) {
+              if (e.subject) {
+                els = els.filter(function(el) {
+                  return evaluate(e.child, [el]).length;
+                });
+              } else {
+                els = evaluate(e.child, els);
+              }
             }
-            if (matchRoots) {
-              els = sel.union(els, filter(e, takeElements(outerRoots)));
-            }
-            if (e.child) els = evaluate(e.child, els);
             break;
           case '+':
           case '~':
           case ',':
+          case '/':
             if (e.children.length === 2) {
               sibs = evaluate(e.children[0], roots, matchRoots);
               els = evaluate(e.children[1], roots, matchRoots);
@@ -2051,7 +2232,14 @@
               els = evaluate(e.children[0], outerParents(roots), matchRoots);
             }
             if (e.type === ',') {
-              els = sel.union(sibs, els);
+              els = union(sibs, els);
+            } else if (e.type === '/') {
+              ids = sibs.map(function(el) {
+                return getAttribute(el, e.idref).replace(/^.*?#/, '');
+              });
+              els = els.filter(function(el) {
+                return ~ids.indexOf(el.id);
+              });
             } else if (e.type === '+') {
               sibs.forEach(function(el) {
                 if ((el = nextElementSibling(el))) el._sel_mark = true;
@@ -2170,13 +2358,25 @@
         return select(selector, roots, matchRoots);
       }
     };
-    return sel.matching = function(els, selector, roots) {
-      var e;
+    matchesSelector = html.matchesSelector || html.mozMatchesSelector || html.webkitMatchesSelector || html.msMatchesSelector;
+    matchesDisconnected = matchesSelector && matchesSelector.call(document.createElement('div'), 'div');
+    sel.matching = matching = function(els, selector, roots) {
+      if (matchesSelector && (matchesDisconnected || els.every(function(el) {
+        return el.document && el.document.nodeType !== 11;
+      }))) {
+        try {
+          return els.filter(function(el) {
+            return matchesSelector.call(el, selector);
+          });
+        } catch (e) {
+  
+        }
+      }
       e = parse(selector);
-      if (!e.child && !e.children) {
-        return filter(e, els);
+      if (!e.child && !e.children && !e.pseudos) {
+        return filter(els, e);
       } else {
-        return sel.intersection(els, sel.sel(selector, roots || findRoots(els), true));
+        return intersection(els, sel.sel(selector, findRoots(els), true));
       }
     };
   })(typeof exports !== "undefined" && exports !== null ? exports : (this['sel'] = {}));
