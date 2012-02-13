@@ -131,7 +131,7 @@ Of course `down()` works on multiple elements simultaneously just like the other
 I want a demo!
 --------------
 
-You'll have to make do with the integration tests. [Here](http://rvagg.github.com/traversty/test/integration/ender_qwery.html) is Traversty running in an Ender build with Qwery and Bonzo and [here](http://rvagg.github.com/traversty/test/integration/ender_sel.html) is the same but with Sel instead of Qwery as the selector engine. There is also a version with no selector engine installed, which will work on most modern browsers (including IE9+) [here](http://rvagg.github.com/traversty/test/integration/ender_noselector.html).
+You'll have to make do with the integration tests. [Here](http://rvagg.github.com/traversty/test/integration/ender_qwery.html) is Traversty running in an Ender build with Qwery and Bonzo. You can also see it running with [Sel](http://rvagg.github.com/traversty/test/integration/ender_sel.html), [Sizzle](http://rvagg.github.com/traversty/test/integration/ender_sizzle.html), [NWMatcher](http://rvagg.github.com/traversty/test/integration/ender_nwmatcher.html) and [without a selector engine](http://rvagg.github.com/traversty/test/integration/ender_sel.html) (works in modern browsers, including IE9+).
 
 View-source to see what it's doing, note that it's operating on 2 lists at the same time.
 
