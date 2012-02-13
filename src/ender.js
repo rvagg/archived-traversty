@@ -17,12 +17,21 @@
           }
         return function(selector, index) { return fn(this, selector, index) }
       }
+    , up = integrate('up')
+    , down = integrate('down')
+    , next = integrate('next')
+    , previous = integrate('previous')
+
   $.ender(
       {
-          up: integrate('up')
-        , down: integrate('down')
-        , next: integrate('next')
-        , previous: integrate('previous')
+          // core
+          up: up
+        , down: down
+        , next: next
+        , previous: previous
+          // aliases
+        , parent: up
+        , prev: previous
       }
     , true
   )

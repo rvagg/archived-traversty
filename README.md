@@ -192,6 +192,9 @@ Traversty will attempt to use whatever selector engine you've included in your E
 
 Traversty is designed to add to the goodness you get in Bonzo, although Bonzo isn't a dependency. Bonzo has `next()` and `previous()` already and it is intended that Traversty replace these in your ender build. Argument-less they should do exactly the same thing but Traversty adds the extra arguments for greater flexibility. If you are using Bonzo in Ender along with Traversty then you should make sure Traversty is included *after* Bonzo. Unfortunately, [Ender doesn't guarantee order](https://github.com/ender-js/Ender/issues/63) so you may have to fiddle a bit. 
 
+### Additional sugar ###
+
+In addition to `up()`, `down()`, `next()`, and `previous()` you'll also get aliases which take the same argument types: `parent()` (same as `up()`), `prev()` (same as `previous()`).
 
 Contributing
 ------------
