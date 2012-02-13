@@ -23,6 +23,7 @@ var jshintOptions = {
   , 'eqnull': true
   , 'browser': true
   , 'node': true
+  , 'laxcomma': true
 }
 require('smoosh')
   .config({
