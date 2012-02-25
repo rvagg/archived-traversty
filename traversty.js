@@ -20,8 +20,7 @@
     , matchesSelector = (function (el, pfx, name, i, ms) {
         while (i < pfx.length)
           if (el[ms = pfx[i++] + name]) return ms
-        return el[name = 'm' + name] ? name : 0
-      }(html, [ 'msM', 'webkitM', 'mozM', 'oM' ], 'atchesSelector', 0))
+      }(html, [ 'msM', 'webkitM', 'mozM', 'oM', 'm' ], 'atchesSelector', 0))
 
     , isNumber = function (o) {
         return toString.call(o) === '[object Number]'
