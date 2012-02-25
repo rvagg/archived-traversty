@@ -41,7 +41,7 @@ require('smoosh')
           'DIST_DIR': './'
         , 'ender': [ './src/ender.js' ]
         , 'tests': [
-              './test/buster.js'
+              './buster.js'
             , './test/common.js'
             , './test/core-test.js'
             , './test/engines-test.js'
