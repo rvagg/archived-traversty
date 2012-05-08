@@ -80,5 +80,6 @@ document.body.appendChild((function() {
     '      <span>S2</span>\n' +
     '      <div>D2</div>\n' +
     '    </div>\n'
+  fixtures.style.display = 'none'
   return fixtures
 }()))

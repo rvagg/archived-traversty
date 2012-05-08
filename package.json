@@ -12,5 +12,6 @@
       , "url": "https://github.com/rvagg/traversty.git"
     }
   , "devDependencies": {
+        "buster": "*"
     }
 }

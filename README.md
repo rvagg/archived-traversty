@@ -207,7 +207,11 @@ While I'm not a coding-style nazi but I do like consistency. I've chosen a parti
 
 ### Tests ###
 
-Traversty uses [Buster](http://busterjs.org) for unit testing. It works by running a server for you to attach browsers to so you can submit all tests to be run in all of the attached browsers right from the command-line.
+Traversty uses [Buster](http://busterjs.org) for unit testing.
+
+#### Client/server ####
+
+This works by running a server for you to attach browsers to so you can submit all tests to be run in all of the attached browsers right from the command-line.
 
 Simply do this:
 
@@ -219,6 +223,10 @@ $ make test                   # will submit the tests to the Buster server to be
 ```
 
 You'll see a nice output with the results of the tests as they happen.
+
+#### Static ####
+
+Since Buster is still in Beta, the capture-server is a bit buggy and can be frustrating. So, an alternative testing method is to simply run the *index.html* file in the *tests* directory in each of the browsers you need to test. It'll load and run the same tests as the capture-server approach.
 
 ### Where are your semi-colons? ###
 
