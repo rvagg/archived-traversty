@@ -1,7 +1,7 @@
 {
     "name": "traversty"
   , "description": "Library agnostic utility for traversing the DOM"
-  , "version": "0.0.6"
+  , "version": "0.0.7"
   , "homepage": "https://github.com/rvagg/traversty"
   , "author": "Rod Vagg <rod@vagg.org> @rvagg"
   , "keywords": ["ender", "dom", "nodes"]

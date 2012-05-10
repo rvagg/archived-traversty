@@ -28,7 +28,7 @@ buster.testCase('traversty', {
     }
 
   , 'traversty() can be passed selector strings': function () {
-      var el, t
+      var t
 
       if (__matchesSelector) { // defined in setup.js
         // T("#fixtures") has #fixtures element (only)
@@ -39,7 +39,8 @@ buster.testCase('traversty', {
         assert.equals((t = T('#fixtures,div#flat')).length, 2)
         assert.same(t[0], Q('#fixtures')[0])
         assert.same(t[1], Q('div#flat')[0])
-      }
+      } else
+        assert(true) // needed for buster
     }
   }
 )

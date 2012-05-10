@@ -98,8 +98,12 @@
       }
 
     , collect = function (els, fn) {
-        var ret = [], i = 0, l = els.length
-        while (i < l) ret = ret.concat(fn(els[i++]))
+        var ret = [], res, i = 0, j, l = els.length, l2
+        while (i < l) {
+          j = 0
+          l2 = (res = fn(els[i++])).length
+          while (j < l2) ret.push(res[j++])
+        }
         return ret
       }
 

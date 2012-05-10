@@ -16,7 +16,6 @@ var jshintOptions = {
   , 'sub': true
   , 'white': false
   , 'indent': 2
-  , 'whitespace': true
   , 'asi': true
   , 'laxbreak': true
   , 'eqeqeq': true
@@ -24,6 +23,7 @@ var jshintOptions = {
   , 'browser': true
   , 'node': true
   , 'laxcomma': true
+  , 'strict': false
 }
 require('smoosh')
   .config({

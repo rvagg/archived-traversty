@@ -36,8 +36,7 @@ var own = Object.prototype.hasOwnProperty
 
 // native must be first so we start off without T.setSelectorEngine() being called
 // we also don't want to run native tests in older browsers that don't support it
-if (!!__matchesSelector)
-  engineTest(null, 'Native')
+if (__matchesSelector) engineTest(null, 'Native')
 engineTest(Q, 'Qwery')
 engineTest(Sizzle, 'Sizzle')
 engineTest(NW.Dom, 'NW')

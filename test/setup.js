@@ -1,12 +1,12 @@
 /*global qwery:true, traversty:true, assert: true, buster:true*/
 
 var Q = qwery.noConflict()
-var T = traversty.noConflict()
-var __matchesSelector = (function (el, pfx, name, i, ms) {
-  while (i < pfx.length)
-    if (el[ms = pfx[i++] + name]) return ms
-  if (el[name = 'm' + name.substring(1)]) return name
-}(document.documentElement, [ 'ms', 'webkit', 'moz', 'o' ], 'MatchesSelector', 0))
+  , T = traversty.noConflict()
+  , __matchesSelector = (function (el, pfx, name, i, ms) {
+      while (i < pfx.length)
+        if (el[ms = pfx[i++] + name]) return ms
+      return false
+    }(document.documentElement, [ 'msM', 'webkitM', 'mozM', 'oM', 'm' ], 'atchesSelector', 0))
 
 assert.equals.message += ": ${2}";
 assert.same.message += ": ${2}";
