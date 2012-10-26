@@ -459,7 +459,7 @@ this.traversalTests = {
           assert.hasExactElements(
               T([]).siblings()
             , '#foobar'
-            , 'sublings() on empty collection returned empty collection'
+            , 'siblings() on empty collection returned empty collection'
           )
         }
 
@@ -470,7 +470,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(5)'
-            , 'sublings() with no-arg returns all siblings (single collection, firstChild)'
+            , 'siblings() with no-arg returns all siblings (single collection, firstChild)'
           )
 
           assert.hasExactElements(
@@ -483,7 +483,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
-            , 'sublings() with no-arg returns all siblings (multi collection, firstChildren)'
+            , 'siblings() with no-arg returns all siblings (multi collection, firstChildren)'
           )
 
           assert.hasExactElements(
@@ -492,7 +492,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(1) > li:nth-child(2),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(4)'
-            , 'sublings() with no-arg returns all siblings (single collection, lastChild)'
+            , 'siblings() with no-arg returns all siblings (single collection, lastChild)'
           )
 
           assert.hasExactElements(
@@ -505,7 +505,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(2) > li:nth-child(2),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(4)'
-            , 'sublings() with no-arg returns all siblings (multi collection, lastChildren)'
+            , 'siblings() with no-arg returns all siblings (multi collection, lastChildren)'
           )
 
           assert.hasExactElements(
@@ -514,7 +514,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(5)'
-            , 'sublings() with no-arg returns all siblings (single collection, midChild)'
+            , 'siblings() with no-arg returns all siblings (single collection, midChild)'
           )
 
           assert.hasExactElements(
@@ -527,7 +527,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
-            , 'sublings() with no-arg returns all siblings (multi collection, midChildren)'
+            , 'siblings() with no-arg returns all siblings (multi collection, midChildren)'
           )
         }
 
@@ -539,7 +539,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(5)'
-            , 'sublings() no-arg with sibs 1 & 5 should also include 1 & 5 in result'
+            , 'siblings() no-arg with sibs 1 & 5 should also include 1 & 5 in result'
           )
 
           assert.hasExactElementsUnordered(
@@ -554,7 +554,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
-            , 'sublings() no-arg with sibs 1s & 5s should also include 1s & 5s in result'
+            , 'siblings() no-arg with sibs 1s & 5s should also include 1s & 5s in result'
           )
         }
 
@@ -565,7 +565,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(5)'
-            , 'sublings(selector) with no-arg returns all siblings (single collection, firstChild)'
+            , 'siblings(selector) returns all siblings (single collection, firstChild)'
           )
 
           assert.hasExactElements(
@@ -578,7 +578,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
-            , 'sublings(selector) with no-arg returns all siblings (multi collection, firstChildren)'
+            , 'siblings(selector) returns all siblings (multi collection, firstChildren)'
           )
 
           assert.hasExactElements(
@@ -587,7 +587,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(1) > li:nth-child(2),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(4)'
-            , 'sublings(selector) with no-arg returns all siblings (single collection, lastChild)'
+            , 'siblings(selector) returns all siblings (single collection, lastChild)'
           )
 
           assert.hasExactElements(
@@ -600,7 +600,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(2) > li:nth-child(2),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(4)'
-            , 'sublings(selector) with no-arg returns all siblings (multi collection, lastChildren)'
+            , 'siblings(selector) returns all siblings (multi collection, lastChildren)'
           )
 
           assert.hasExactElements(
@@ -609,7 +609,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(5)'
-            , 'sublings(selector) with no-arg returns all siblings (single collection, midChild)'
+            , 'siblings(selector) returns all siblings (single collection, midChild)'
           )
 
           assert.hasExactElements(
@@ -622,7 +622,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
-            , 'sublings(selector) with no-arg returns all siblings (multi collection, midChildren)'
+            , 'siblings(selector) returns all siblings (multi collection, midChildren)'
           )
 
           assert.hasExactElements(
@@ -635,7 +635,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
-            , 'sublings(*) with no-arg returns all siblings (multi collection, midChildren)'
+            , 'siblings(*) returns all siblings (multi collection, midChildren)'
           )
         }
  
@@ -647,7 +647,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(1) > li:nth-child(5)'
-            , 'sublings() no-arg with sibs 1 & 5 should also include 1 & 5 in result'
+            , 'siblings() no-arg with sibs 1 & 5 should also include 1 & 5 in result'
           )
 
           assert.hasExactElementsUnordered(
@@ -662,7 +662,7 @@ this.traversalTests = {
               + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
-            , 'sublings() no-arg with sibs 1s & 5s should also include 1s & 5s in result'
+            , 'siblings() no-arg with sibs 1s & 5s should also include 1s & 5s in result'
           )
         }
  
@@ -670,40 +670,40 @@ this.traversalTests = {
           assert.hasExactElements(
               T(Q('#fixtures > ul:first-child > li:first-child')).siblings(2)
             ,  '#fixtures > ul:nth-child(1) > li:nth-child(4)'
-            , 'sublings(index) returns correct sibling (single collection, firstChild)'
+            , 'siblings(index) returns correct sibling (single collection, firstChild)'
           )
 
           assert.hasExactElements(
               T(Q('#fixtures > ul > li:first-child')).siblings(3)
             ,   '#fixtures > ul:nth-child(1) > li:nth-child(5),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
-            , 'sublings(index) returns correct siblings (multi collection, firstChildren)'
+            , 'siblings(index) returns correct siblings (multi collection, firstChildren)'
           )
 
           assert.hasExactElements(
               T(Q('#fixtures > ul:first-child > li:nth-child(5)')).siblings(1)
             ,   '#fixtures > ul:nth-child(1) > li:nth-child(2),'
-            , 'sublings(index) returns correct sibling (single collection, lastChild)'
+            , 'siblings(index) returns correct sibling (single collection, lastChild)'
           )
 
           assert.hasExactElements(
               T(Q('#fixtures > ul > li:nth-child(5)')).siblings(2)
             ,   '#fixtures > ul:nth-child(1) > li:nth-child(3),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
-            , 'sublings(index) returns correct siblings (multi collection, lastChildren)'
+            , 'siblings(index) returns correct siblings (multi collection, lastChildren)'
           )
 
           assert.hasExactElements(
               T(Q('#fixtures > ul:first-child > li:nth-child(2)')).siblings(3)
             ,   '#fixtures > ul:nth-child(1) > li:nth-child(5),'
-            , 'sublings(index) returns correct sibling (single collection, midChild)'
+            , 'siblings(index) returns correct sibling (single collection, midChild)'
           )
 
           assert.hasExactElements(
               T(Q('#fixtures > ul > li:nth-child(2)')).siblings(2)
             ,   '#fixtures > ul:nth-child(1) > li:nth-child(4),'
               + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
-            , 'sublings(index) returns siblings (multi collection, midChildren)'
+            , 'siblings(index) returns siblings (multi collection, midChildren)'
           )
         }
 
@@ -759,6 +759,145 @@ this.traversalTests = {
               + ',#fixtures > ul:nth-child(2) > li:nth-child(4)'
               + ',#fixtures > ul:nth-child(2) > li li:nth-child(4)'
             , 'siblings(.c, 2) on returns correct elements (complex, multi-depth selector)'
+          )
+        }
+    }
+
+  , 'children()': {
+        'children() of empty collection': function () {
+          assert.hasExactElements(
+              T([]).children()
+            , '#foobar'
+            , 'children() on empty collection returned empty collection'
+          )
+        }
+
+      , 'children() with no argument returns all children': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child')).children()
+            , '#fixtures > ul:nth-child(1) > li'
+            , 'sublings() with no-arg returns all children (single collection, firstChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul')).children()
+            , '#fixtures > ul > li,'
+            , 'sublings() with no-arg returns all children (multi collection, firstChildren)'
+          )
+        }
+
+      , 'children(selector) returns correct elements': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child')).children('li')
+            , '#fixtures > ul:nth-child(1) > li'
+            , 'sublings(selector) returns all children (single collection, firstChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul')).children('li')
+            , '#fixtures > ul > li'
+            , 'sublings(selector) returns all children (multi collection, firstChildren)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul')).children('*')
+            , '#fixtures > ul > li'
+            , 'sublings(selector) returns all children (multi collection, firstChildren)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul')).children('.c')
+            , '#fixtures > ul > li.c'
+            , 'sublings(selector) returns correct children'
+          )
+        }
+ 
+      , 'children(index)': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child')).children(2)
+            ,  '#fixtures > ul:nth-child(1) > li:nth-child(3)'
+            , 'sublings(index) returns correct sibling (single collection, firstChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul')).children(3)
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(4)'
+            , 'sublings(index) returns correct children (multi collection, firstChildren)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child')).children(1)
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+            , 'sublings(index) returns correct sibling (single collection, lastChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul')).children(2)
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
+            , 'sublings(index) returns correct children (multi collection, lastChildren)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child')).children(3)
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+            , 'sublings(index) returns correct sibling (single collection, midChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul')).children(2)
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
+            , 'sublings(index) returns children (multi collection, midChildren)'
+          )
+        }
+
+      , 'children(selector, index)': function () {
+          assert.hasExactElements(
+              T([]).children('*', 0)
+            , '#foobar'
+            , 'children(*,0) on empty collection returns empty collection'
+          )
+
+          assert.hasExactElements(
+              T([]).children('*', 10)
+            , '#foobar'
+            , 'children(*,10) on empty collection returns empty collection'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child')).children('*', 1)
+            , '#fixtures > ul:first-child > li:nth-child(2)'
+            , 'children(*,1) on returns correct element (after)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child')).children('*', 1)
+            , '#fixtures > ul:first-child > li:nth-child(2)'
+            , 'children(*,1) on returns correct element (before)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul')).children('*', 1)
+            ,    '#fixtures > ul:nth-child(1) > li:nth-child(2)'
+              + ',#fixtures > ul:nth-child(2) > li:nth-child(2)'
+            , 'children(*,1) on returns correct element (after, multi)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul')).children('*', 20)
+            ,    '#foobar'
+            , 'children(*, 29) on returns empty collection'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures ul')).children('.c', 1)
+            ,    '#fixtures > ul:nth-child(1) > li:nth-child(4)'
+              + ',#fixtures > ul:nth-child(1) li li:nth-child(4)'
+              + ',#fixtures > ul:nth-child(2) > li:nth-child(4)'
+              + ',#fixtures > ul:nth-child(2) > li li:nth-child(4)'
+            , 'children(.c, 2) on returns correct elements (complex, multi-depth selector)'
           )
         }
     }

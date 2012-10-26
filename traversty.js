@@ -137,7 +137,7 @@
                 // ignore non-elements, only consider selector-matching elements
                 // handle both the index and no-index (selector-only) cases
                 if (isElement(el)
-                    && (!filterFn || filterFn(el, elind))
+                    && (!filterFn || (filterFn === true || filterFn(el, elind)))
                     && selectorMatches(selector, el)
                     && (index === null || i-- === 0)) {
                   // this concat vs push is to make sure we add elements to the result array
@@ -238,6 +238,10 @@
               return traversty(move(arr, 'nextSibling', selector || '*', index
                     , function (el, i) { return el !== self[i] } // filter
                   ))
+            }
+
+          , children: function (selector, index) {
+              return traversty(move(T.prototype.down.call(this), 'nextSibling', selector || '*', index, true))
             }
 
           , first: function () {
