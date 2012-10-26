@@ -81,6 +81,7 @@
         }
       }
 
+      // is 'element' underneath 'container' somewhere
     , isAncestor = 'compareDocumentPosition' in html
         ? function (element, container) {
             return (container.compareDocumentPosition(element) & 16) == 16
@@ -90,11 +91,12 @@
               container = container.nodeType === 9 || container == window ? html : container
               return container !== element && container.contains(element)
             }
-          : function (element, container) {
+          : function (element, container) { // old smelly browser
               while (element = element.parentNode) if (element === container) return 1
               return 0
             }
 
+      // return an array containing only unique elements
     , unique = function (ar) {
         var a = [], i = -1, j, has
         while (++i < ar.length) {
@@ -111,6 +113,7 @@
         return a
       }
 
+      // for each element of 'els' execute 'fn' to get an array of elements to collect
     , collect = function (els, fn) {
         var ret = [], res, i = 0, j, l = els.length, l2
         while (i < l) {
@@ -121,6 +124,7 @@
         return ret
       }
 
+     // generic DOM navigator to move multiple elements around the DOM
    , move = function (els, method, selector, index) {
         index = getIndex(selector, index)
         selector = getSelector(selector)
@@ -144,12 +148,14 @@
         )
       }
 
+      // given an index & length, return a 'fixed' index, fixes non-numbers & neative indexes
     , eqIndex = function (length, index, def) {
         if (index < 0) index = length + index
         if (index < 0 || index >= length) return null
         return !index && index !== 0 ? def : index
       }
 
+      // collect elements of an array that match a filter function
     , filter = function (els, fn) {
         var arr = [], i = 0, l = els.length
         for (; i < l; i++)
@@ -157,6 +163,8 @@
         return arr
       }
 
+      // create a filter function, for use by filter(), is() & not()
+      // allows the argument to be an element, a function or a selector
     , filterFn = function (slfn) {
         var to
         return isElement(slfn)
@@ -168,6 +176,7 @@
               : function () { return false }
       }
 
+      // fn = !fn
     , inv = function (fn) {
         return function () {
           return !fn.apply(this, arguments)
@@ -224,6 +233,7 @@
               return traversty((index = eqIndex(this.length, index, 0)) === null ? [] : this[index])
             }
 
+            // a crazy man wrote this, don't try to understand it, see the tests
           , slice: function (start, end) {
               var e = end, l = this.length, arr = []
               start = eqIndex(l, Math.max(-this.length, start), 0)
@@ -242,15 +252,16 @@
               return traversty(filter(this, inv(filterFn(slfn))))
             }
 
+            // same as filter() but return a boolean so quick-return after first successful find
           , is: function (slfn) {
               var i = 0, l = this.length
                 , fn = filterFn(slfn)
-
               for (; i < l; i++)
                 if (fn(this[i], i)) return true
               return false
             }
 
+            // similar to filter() but cares about descendent elements
           , has: function (slel) {
               return traversty(filter(
                   this
