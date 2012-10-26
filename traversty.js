@@ -1,5 +1,5 @@
 /**************************************************************
-  * Traversty: DOM Traversal Utility (c) Rod Vagg (@rvagg) 2011
+  * Traversty: DOM Traversal Utility (c) Rod Vagg (@rvagg) 2012
   * https://github.com/rvagg/traversty
   * License: MIT
   */
@@ -81,6 +81,20 @@
         }
       }
 
+    , isAncestor = 'compareDocumentPosition' in html
+        ? function (element, container) {
+            return (container.compareDocumentPosition(element) & 16) == 16
+          }
+        : 'contains' in html
+          ? function (element, container) {
+              container = container.nodeType === 9 || container == window ? html : container
+              return container !== element && container.contains(element)
+            }
+          : function (element, container) {
+              while (element = element.parentNode) if (element === container) return 1
+              return 0
+            }
+
     , unique = function (ar) {
         var a = [], i = -1, j, has
         while (++i < ar.length) {
@@ -130,6 +144,36 @@
         )
       }
 
+    , eqIndex = function (length, index, def) {
+        if (index < 0) index = length + index
+        if (index < 0 || index >= length) return null
+        return !index && index !== 0 ? def : index
+      }
+
+    , filter = function (els, fn) {
+        var arr = [], i = 0, l = els.length
+        for (; i < l; i++)
+          fn(els[i], i) && arr.push(els[i])
+        return arr
+      }
+
+    , filterFn = function (slfn) {
+        var to
+        return isElement(slfn)
+          ? function (el) { return el === slfn }
+          : (to = typeof slfn) == 'function'
+            ? function (el, i) { return slfn.call(el, i) }
+            : to == 'string' && slfn.length
+              ? function (el) { return selectorMatches(slfn, el) }
+              : function () { return false }
+      }
+
+    , inv = function (fn) {
+        return function () {
+          return !fn.apply(this, arguments)
+        }
+      }
+
     , traversty = (function () {
         function T(els) {
           this.length = 0
@@ -163,6 +207,56 @@
           , next: function (selector, index) {
               return traversty(move(this, 'nextSibling', selector, index))
             }
+
+          , first: function () {
+              return T.prototype.eq.call(this, 0)
+            }
+
+          , last: function () {
+              return T.prototype.eq.call(this, -1)
+            }
+
+          , eq: function (index) {
+              return traversty((index = eqIndex(this.length, index, 0)) === null ? [] : this[index])
+            }
+
+          , slice: function (start, end) {
+              var e = end, l = this.length, arr = []
+              start = eqIndex(l, Math.max(-this.length, start), 0)
+              e = eqIndex(end < 0 ? l : l + 1, end, l)
+              end = e === null || e > l ? end < 0 ? 0 : l : e
+              while (start !== null && start < end)
+                arr.push(this[start++])
+              return traversty(arr)
+            }
+
+          , filter: function (slfn) {
+              return traversty(filter(this, filterFn(slfn)))
+            }
+
+          , not: function (slfn) {
+              return traversty(filter(this, inv(filterFn(slfn))))
+            }
+
+          , is: function (slfn) {
+              var i = 0, l = this.length
+                , fn = filterFn(slfn)
+
+              for (; i < l; i++)
+                if (fn(this[i], i)) return true
+              return false
+            }
+
+          , has: function (slel) {
+              return traversty(filter(
+                  this
+                , isElement(slel)
+                    ? function (el) { return isAncestor(slel, el) }
+                    : typeof slel == 'string' && slel.length
+                      ? function (el) { return selectorFind(slel, el).length } //TODO: performance
+                      : function () { return false }
+              ))
+            }
         }
 
         function t(els) {
@@ -174,6 +268,7 @@
           var ss, r, a, _selectorMatches, _selectorFind
             , e = doc.createElement('p')
             , select = s.select || s.sel || s
+
           e.innerHTML = '<a/><i/><b/>'
           a = e.firstChild
           try {
@@ -229,4 +324,4 @@
       }())
  
   return traversty
-}))
+}));

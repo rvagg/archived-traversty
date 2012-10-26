@@ -10,9 +10,10 @@ config['Traversty Tests'] = {
       , './test/vendor/es5-basic_mod.js'
       , './test/vendor/sel.js'
       , './test/noconflict.js'
-      , './src/traversty.js'
+      , './traversty.js'
       , './test/setup.js'
-      , './test/common.js'
+      , './test/traversal.js'
+      , './test/filters.js'
     ]
   , tests: [
       './test/*-test.js'
