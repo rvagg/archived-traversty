@@ -1,18 +1,18 @@
-/*global qwery:true, traversty:true, assert: true, buster:true*/
+/*global qwery:true, traversty:true, buster:true*/
 
-var Q = qwery.noConflict()
-  , T = traversty.noConflict()
-  , __matchesSelector = (function (el, pfx, name, i, ms) {
+this.Q = qwery.noConflict()
+this.T = traversty.noConflict()
+this.__matchesSelector = (function (el, pfx, name, i, ms) {
       while (i < pfx.length)
         if (el[ms = pfx[i++] + name]) return ms
       return false
     }(document.documentElement, [ 'msM', 'webkitM', 'mozM', 'oM', 'm' ], 'atchesSelector', 0))
 
-assert.equals.message += ": ${2}";
-assert.same.message += ": ${2}";
+//assert.equals.message += ": ${2}";
+//assert.same.message += ": ${2}";
 
 buster.assertions.add("hasExactElements", {
-    assert: function (actual, expectedSelector, message) {
+    assert: function (actual, expectedSelector) {
       var i
       this.elements = Q(expectedSelector)
       this.actual = []
@@ -24,7 +24,23 @@ buster.assertions.add("hasExactElements", {
       return true
     }
   , assertMessage: "Expected ${actual} to be ${elements} (selector: ${1}): ${2}"
-});
+})
+
+buster.assertions.add("hasExactElementsUnordered", {
+    assert: function (actual, expectedSelector) {
+      var i, j, found = 0
+      this.elements = Q(expectedSelector)
+      this.actual = []
+      for (i = 0; i < actual.length; i++)
+        this.actual.push(actual[i])
+      if (this.elements.length !== this.actual.length) return false
+      for (i = 0; i < this.elements.length; i++)
+        for (j = 0; j < actual.length; j++)
+          if (this.elements[i] === actual[j]) found++
+      return found == actual.length
+    }
+  , assertMessage: "Expected ${actual} to be ${elements} (selector: ${1}): ${2}"
+})
 
 
 document.body.appendChild((function() {

@@ -118,30 +118,33 @@
         var ret = [], res, i = 0, j, l = els.length, l2
         while (i < l) {
           j = 0
-          l2 = (res = fn(els[i++])).length
+          l2 = (res = fn(els[i], i++)).length
           while (j < l2) ret.push(res[j++])
         }
         return ret
       }
 
      // generic DOM navigator to move multiple elements around the DOM
-   , move = function (els, method, selector, index) {
+   , move = function (els, method, selector, index, filterFn) {
         index = getIndex(selector, index)
         selector = getSelector(selector)
         return collect(els
-          , function (el) {
+          , function (el, elind) {
               var i = index || 0, ret = []
-              while (el && (index === null || i >= 0)) {
+              if (!filterFn)
                 el = el[method]
+              while (el && (index === null || i >= 0)) {
                 // ignore non-elements, only consider selector-matching elements
                 // handle both the index and no-index (selector-only) cases
-                if (isElement(el) &&
-                    selectorMatches(selector, el) &&
-                    (index === null || i-- === 0)) {
+                if (isElement(el)
+                    && (!filterFn || filterFn(el, elind))
+                    && selectorMatches(selector, el)
+                    && (index === null || i-- === 0)) {
                   // this concat vs push is to make sure we add elements to the result array
                   // in reverse order when doing a previous(selector) and up(selector)
                   index === null && method !== 'nextSibling' ? ret = [el].concat(ret) : ret.push(el)
                 }
+                el = el[method]
               }
               return ret
             }
@@ -219,6 +222,22 @@
 
           , next: function (selector, index) {
               return traversty(move(this, 'nextSibling', selector, index))
+            }
+
+          , siblings: function (selector, index) {
+              var self = this
+                , arr = slice.call(this, 0)
+                , i = 0, l = arr.length
+              for (; i < l; i++) {
+                arr[i] = arr[i].parentNode.firstChild
+                while (!isElement(arr[i])) arr[i] = arr[i].nextSibling
+              }
+              if (isUndefined(selector))
+                selector = '*'
+
+              return traversty(move(arr, 'nextSibling', selector || '*', index
+                    , function (el, i) { return el !== self[i] } // filter
+                  ))
             }
 
           , first: function () {

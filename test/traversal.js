@@ -452,6 +452,314 @@ this.traversalTests = {
             , 'parents("ul, li") on two deep elements matches all <ul> and <li> ancestor elements'
           )
         }
+    }
 
+  , 'siblings()': {
+        'siblings() of empty collection': function () {
+          assert.hasExactElements(
+              T([]).siblings()
+            , '#foobar'
+            , 'sublings() on empty collection returned empty collection'
+          )
+        }
+
+      , 'siblings() with no argument returns all siblings': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child > li:first-child')).siblings()
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(5)'
+            , 'sublings() with no-arg returns all siblings (single collection, firstChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li:first-child')).siblings()
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(5),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
+            , 'sublings() with no-arg returns all siblings (multi collection, firstChildren)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child > li:nth-child(5)')).siblings()
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4)'
+            , 'sublings() with no-arg returns all siblings (single collection, lastChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li:nth-child(5)')).siblings()
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(4)'
+            , 'sublings() with no-arg returns all siblings (multi collection, lastChildren)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child > li:nth-child(2)')).siblings()
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(5)'
+            , 'sublings() with no-arg returns all siblings (single collection, midChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li:nth-child(2)')).siblings()
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(5),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
+            , 'sublings() with no-arg returns all siblings (multi collection, midChildren)'
+          )
+        }
+
+      , 'siblings() on siblings should include those siblings': function () {
+          assert.hasExactElementsUnordered(
+              T(Q('#fixtures > ul:first-child > li:nth-child(1),#fixtures > ul:first-child > li:nth-child(3)')).siblings()
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(5)'
+            , 'sublings() no-arg with sibs 1 & 5 should also include 1 & 5 in result'
+          )
+
+          assert.hasExactElementsUnordered(
+              T(Q('#fixtures > ul > li:nth-child(1),#fixtures > ul > li:nth-child(5)')).siblings()
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(5),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
+            , 'sublings() no-arg with sibs 1s & 5s should also include 1s & 5s in result'
+          )
+        }
+
+      , 'siblings(selector) returns correct elements': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child > li:first-child')).siblings('li')
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(5)'
+            , 'sublings(selector) with no-arg returns all siblings (single collection, firstChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li:first-child')).siblings('li')
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(5),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
+            , 'sublings(selector) with no-arg returns all siblings (multi collection, firstChildren)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child > li:nth-child(5)')).siblings('li')
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4)'
+            , 'sublings(selector) with no-arg returns all siblings (single collection, lastChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li:nth-child(5)')).siblings('li')
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(4)'
+            , 'sublings(selector) with no-arg returns all siblings (multi collection, lastChildren)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child > li:nth-child(2)')).siblings('li')
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(5)'
+            , 'sublings(selector) with no-arg returns all siblings (single collection, midChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li:nth-child(2)')).siblings('li')
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(5),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
+            , 'sublings(selector) with no-arg returns all siblings (multi collection, midChildren)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li:nth-child(2)')).siblings('*')
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(5),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
+            , 'sublings(*) with no-arg returns all siblings (multi collection, midChildren)'
+          )
+        }
+ 
+      , 'siblings(selector) on matching siblings should include those siblings': function () {
+          assert.hasExactElementsUnordered(
+              T(Q('#fixtures > ul:first-child > li:nth-child(1),#fixtures > ul:first-child > li:nth-child(5)')).siblings('li')
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(5)'
+            , 'sublings() no-arg with sibs 1 & 5 should also include 1 & 5 in result'
+          )
+
+          assert.hasExactElementsUnordered(
+              T(Q('#fixtures > ul > li:nth-child(1),#fixtures > ul > li:nth-child(5)')).siblings('*')
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(1) > li:nth-child(5),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(1),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(2),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
+            , 'sublings() no-arg with sibs 1s & 5s should also include 1s & 5s in result'
+          )
+        }
+ 
+      , 'siblings(index)': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child > li:first-child')).siblings(2)
+            ,  '#fixtures > ul:nth-child(1) > li:nth-child(4)'
+            , 'sublings(index) returns correct sibling (single collection, firstChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li:first-child')).siblings(3)
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(5),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(5)'
+            , 'sublings(index) returns correct siblings (multi collection, firstChildren)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child > li:nth-child(5)')).siblings(1)
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(2),'
+            , 'sublings(index) returns correct sibling (single collection, lastChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li:nth-child(5)')).siblings(2)
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(3),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(3),'
+            , 'sublings(index) returns correct siblings (multi collection, lastChildren)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child > li:nth-child(2)')).siblings(3)
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(5),'
+            , 'sublings(index) returns correct sibling (single collection, midChild)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li:nth-child(2)')).siblings(2)
+            ,   '#fixtures > ul:nth-child(1) > li:nth-child(4),'
+              + '#fixtures > ul:nth-child(2) > li:nth-child(4),'
+            , 'sublings(index) returns siblings (multi collection, midChildren)'
+          )
+        }
+
+      , 'siblings(selector, index)': function () {
+          assert.hasExactElements(
+              T([]).siblings('*', 0)
+            , '#foobar'
+            , 'siblings(*,0) on empty collection returns empty collection'
+          )
+
+          assert.hasExactElements(
+              T([]).siblings('*', 10)
+            , '#foobar'
+            , 'siblings(*,10) on empty collection returns empty collection'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child > li:first-child')).siblings('*', 1)
+            , '#fixtures > ul:first-child > li:nth-child(3)'
+            , 'siblings(*,1) on returns correct element (after)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul:first-child > li:nth-child(4)')).siblings('*', 1)
+            , '#fixtures > ul:first-child > li:nth-child(2)'
+            , 'siblings(*,1) on returns correct element (before)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li:first-child')).siblings('*', 1)
+            ,    '#fixtures > ul:nth-child(1) > li:nth-child(3)'
+              + ',#fixtures > ul:nth-child(2) > li:nth-child(3)'
+            , 'siblings(*,1) on returns correct element (after, multi)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li:nth-child(4)')).siblings('*', 1)
+            ,    '#fixtures > ul:nth-child(1) > li:nth-child(2)'
+              + ',#fixtures > ul:nth-child(2) > li:nth-child(2)'
+            , 'siblings(*,1) on returns correct element (before, multi)'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li:nth-child(4)')).siblings('*', 20)
+            ,    '#foobar'
+            , 'siblings(*, 29) on returns empty collection'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul li:nth-child(3)')).siblings('.c', 1)
+            ,    '#fixtures > ul:nth-child(1) > li:nth-child(4)'
+              + ',#fixtures > ul:nth-child(1) li li:nth-child(4)'
+              + ',#fixtures > ul:nth-child(2) > li:nth-child(4)'
+              + ',#fixtures > ul:nth-child(2) > li li:nth-child(4)'
+            , 'siblings(.c, 2) on returns correct elements (complex, multi-depth selector)'
+          )
+        }
     }
 }
