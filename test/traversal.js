@@ -901,4 +901,106 @@ this.traversalTests = {
           )
         }
     }
+
+  , 'closest()': {
+        'closest() no-arg returns empty set': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li')).closest()
+            , '#foobar'
+            , 'closest() with no arguments returns empty set'
+          )
+
+          assert.hasExactElements(
+              T(Q('#foobar')).closest()
+            , '#foobar'
+            , 'closest() on empty set with no arguments returns empty set'
+          )
+
+          assert.hasExactElements(
+              T(Q('#foobar')).closest('*')
+            , '#foobar'
+            , 'closest(*) on empty set with no arguments returns empty set'
+          )
+        }
+
+      , 'closest(index) === up(index)': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li')).closest(0)
+            , '#fixtures > ul > li'
+            , 'closest(0) returns same elements'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).closest(1)
+            , '#fixtures > ul > li > ul > li:nth-child(4)'
+            , 'closest(1) moves up to parent node'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).closest(5)
+            , '#fixtures'
+            , 'closest(5) on two elements moved to *single* common ancestor node for both'
+          )
+        }
+
+      , 'closest(selector, index) === up(selector, index)': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).closest('span', 0)
+            , '#fixtures > ul > li > ul > li > span'
+            , 'closest("span", 0) returns same elements'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).closest('li', 0)
+            , '#fixtures > ul > li > ul > li:nth-child(4)'
+            , 'closest("li", 0) returns empty set'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).closest('li', 1)
+            , '#fixtures > ul > li:nth-child(4)'
+            , 'closest("li", 1) moves to second li parentNode (3rd actual parentNode) of both elements'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).closest('li.c', 1)
+            , '#fixtures > ul > li:nth-child(4)'
+            , 'closest("li.c", 1) moves to second li parentNode with class "c" (3rd actual parentNode) of both elements'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).closest('li, ul', 2)
+            , '#fixtures > ul > li:nth-child(4)'
+            , 'closest("li, ul", 2) moves to 3rd parentNode, either <li> or <ul> of both elements'
+          )
+        }
+
+      , 'closest(selector, index) === up(selector, index) returns unique elements': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).closest('#fixtures', 0)
+            , '#fixtures'
+            , 'closest("#fixtures", 0) moves up to common (single) parent node of both elements'
+          )
+        }
+
+      , 'closest(selector) === up(selector)': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).closest('li')
+            , '#fixtures > ul:nth-child(1) > li > ul > li:nth-child(4), #fixtures > ul > li > ul > li:nth-child(4)'
+            , 'closest("li") on two deep elements matches parent <li> ancestor elements'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).closest('*')
+            , '#fixtures > ul > li > ul > li > span'
+            , 'closest("*") returns same elements'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).closest('ul, li')
+            , '#fixtures > ul:nth-child(1) > li > ul > li:nth-child(4), #fixtures > ul > li > ul > li:nth-child(4)'
+            , 'closest("ul, li") on two deep elements matches parent <li> ancestor elements'
+          )
+        }
+    }
 }

@@ -18,7 +18,7 @@
         .not('.second').css('borderBottom', 'solid 3px blue')
         .down('.second li').has('span').css('marginTop', '10px')
         .up('ul').eq(-1).css('borderLeft', 'solid 5px orange')
-        .parents('#fixtures').down('li').slice(-10,-9).css('fontSize', '25px')
+        .closest('#fixtures').down('li').slice(-10,-9).css('fontSize', '25px')
 
       if ($('li').is('.c')) $('<div>INTEGRATION TEST ALL DONE!</div>').prependTo('#fixtures')
     })
@@ -61,14 +61,12 @@
       </li>
       <li class="c">five (purple)</li>
     </ul>
-    <div id="flat">
-      <p>P1</p>
-      <span>S1</span>
-      <div>D1</div>
-      <p>P2</p>
-      <span>S2</span>
-      <div>D2</div>
-    </div>
+  </div>
+
+  <div id="reference">
+    <h2>Reference screenshot</h2>
+    <p>The above block should look similar to this:</p>
+    <img src="integration_reference.png" style="border: 1px solid rgb(100,100,100); box-shadow: 2px 2px 15px rgb(100,100,100);">
   </div>
 
   <p>See also:</p>

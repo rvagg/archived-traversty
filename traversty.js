@@ -216,6 +216,18 @@
               return T.prototype.up.apply(this, arguments.length ? arguments : [ '*' ])
             }
 
+          , closest: function (selector, index) {
+              if (isNumber(selector)) {
+                index = selector
+                selector = '*'
+              } else if (!isString(selector)) {
+                return traversty([])
+              } else if (!isNumber(index)) {
+                index = 0
+              }
+              return traversty(move(this, 'parentNode', selector, index, true))
+            }
+
           , previous: function (selector, index) {
               return traversty(move(this, 'previousSibling', selector, index))
             }

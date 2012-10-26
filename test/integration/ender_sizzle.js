@@ -3246,6 +3246,18 @@
                 return T.prototype.up.apply(this, arguments.length ? arguments : [ '*' ])
               }
 
+            , closest: function (selector, index) {
+                if (isNumber(selector)) {
+                  index = selector
+                  selector = '*'
+                } else if (!isString(selector)) {
+                  return traversty([])
+                } else if (!isNumber(index)) {
+                  index = 0
+                }
+                return traversty(move(this, 'parentNode', selector, index, true))
+              }
+
             , previous: function (selector, index) {
                 return traversty(move(this, 'previousSibling', selector, index))
               }
@@ -3415,7 +3427,7 @@
             }
           return function (selector, index) { return fn(this, selector, index) }
         }
-      , methods = 'up down next previous parents siblings children first last eq slice filter not is has'.split(' ')
+      , methods = 'up down next previous parents closest siblings children first last eq slice filter not is has'.split(' ')
       , b = {}, i = methods.length
 
     while (--i >= 0) b[methods[i]] = integrate(methods[i])

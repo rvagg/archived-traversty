@@ -18,7 +18,7 @@
           }
         return function (selector, index) { return fn(this, selector, index) }
       }
-    , methods = 'up down next previous parents siblings children first last eq slice filter not is has'.split(' ')
+    , methods = 'up down next previous parents closest siblings children first last eq slice filter not is has'.split(' ')
     , b = {}, i = methods.length
 
   while (--i >= 0) b[methods[i]] = integrate(methods[i])
