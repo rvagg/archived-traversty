@@ -1,4 +1,5 @@
 /*global ender:true*/
+
 (function ($) {
   var t = require('traversty')
     , integrated = false

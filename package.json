@@ -6,7 +6,7 @@
   , "author": "Rod Vagg <rod@vagg.org> @rvagg"
   , "keywords": ["ender", "dom", "nodes"]
   , "main": "./traversty.js"
-  , "ender": "./src/ender.js"
+  , "ender": "./ender_bridge.js"
   , "repository": {
         "type": "git"
       , "url": "https://github.com/rvagg/traversty.git"
