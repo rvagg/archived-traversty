@@ -369,4 +369,89 @@ this.traversalTests = {
 
         }
     }
+
+  , 'parents()': {
+        'parents() is the same as up(*)': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).parents()
+            , 'html, body, #fixtures, #fixtures > ul:nth-child(1), #fixtures > ul:nth-child(1) > li:nth-child(4), #fixtures > ul:nth-child(1) > li:nth-child(4) > ul, #fixtures > ul:nth-child(1) > li > ul > li:nth-child(4), #fixtures > ul, #fixtures > ul > li:nth-child(4), #fixtures > ul > li:nth-child(4) > ul, #fixtures > ul > li > ul > li:nth-child(4)'
+            , 'parents() on two deep elements matches all ancestor elements up to <html>'
+          )
+        }
+
+      , 'parents(index) === up(index)': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).parents(0)
+            , '#fixtures > ul > li > ul > li:nth-child(4)'
+            , 'parents(0) on two elements moved to 1st parentNode on both'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).parents(3)
+            , '#fixtures > ul'
+            , 'parents(3) on two elements moved to 3rd parentNode on both'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).parents(4)
+            , '#fixtures'
+            , 'parents(4) on two elements moved to *single* common ancestor node for both'
+          )
+        }
+
+      , 'parents(selector, index) === up(selector, index)': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).parents('li', 0)
+            , '#fixtures > ul > li > ul > li:nth-child(4)'
+            , 'parents("li", 0) moves to first parentNode of both elements'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).parents('li', 1)
+            , '#fixtures > ul > li:nth-child(4)'
+            , 'parents("li", 1) moves to second li parentNode (3rd actual parentNode) of both elements'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).parents('li.c', 1)
+            , '#fixtures > ul > li:nth-child(4)'
+            , 'parents("li.c", 0) moves to second li parentNode with class "c" (3rd actual parentNode) of both elements'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).parents('li, ul', 2)
+            , '#fixtures > ul > li:nth-child(4)'
+            , 'parents("li, ul", 2) moves to 3rd parentNode, either <li> or <ul> of both elements'
+          )
+        }
+
+      , 'parents(selector, index) === up(selector, index) returns unique elements': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).parents('#fixtures', 0)
+            , '#fixtures'
+            , 'parents("#fixtures", 0) moves up to common (single) parent node of both elements'
+          )
+        }
+
+      , 'parents(selector) === up(selector)': function () {
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).parents('li')
+            , '#fixtures > ul:nth-child(1) > li:nth-child(4), #fixtures > ul:nth-child(1) > li > ul > li:nth-child(4),#fixtures > ul > li:nth-child(4), #fixtures > ul > li > ul > li:nth-child(4)'
+            , 'parents("li") on two deep elements matches all <li> ancestor elements'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).parents('*')
+            , 'html, body, #fixtures, #fixtures > ul:nth-child(1), #fixtures > ul:nth-child(1) > li:nth-child(4), #fixtures > ul:nth-child(1) > li:nth-child(4) > ul, #fixtures > ul:nth-child(1) > li > ul > li:nth-child(4), #fixtures > ul, #fixtures > ul > li:nth-child(4), #fixtures > ul > li:nth-child(4) > ul, #fixtures > ul > li > ul > li:nth-child(4)'
+            , 'parents("*") on two deep elements matches all ancestor elements up to <html>'
+          )
+
+          assert.hasExactElements(
+              T(Q('#fixtures > ul > li > ul > li > span')).parents('ul, li')
+            , '#fixtures > ul:nth-child(1), #fixtures > ul:nth-child(1) > li:nth-child(4), #fixtures > ul:nth-child(1) > li:nth-child(4) > ul, #fixtures > ul:nth-child(1) > li > ul > li:nth-child(4),#fixtures > ul, #fixtures > ul > li:nth-child(4), #fixtures > ul > li > ul, #fixtures > ul > li > ul > li:nth-child(4)'
+            , 'parents("ul, li") on two deep elements matches all <ul> and <li> ancestor elements'
+          )
+        }
+
+    }
 }

@@ -200,6 +200,10 @@
               return traversty(move(this, 'parentNode', selector, index))
             }
 
+          , parents: function () {
+              return T.prototype.up.apply(this, arguments.length ? arguments : [ '*' ])
+            }
+
           , previous: function (selector, index) {
               return traversty(move(this, 'previousSibling', selector, index))
             }
