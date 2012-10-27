@@ -308,6 +308,7 @@
               ))
             }
         }
+        T.prototype.prev = T.prototype.previous
 
         function t(els) {
           return new T(isString(els) ? selectorFind(els, doc) : els)
