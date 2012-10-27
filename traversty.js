@@ -137,7 +137,7 @@
                 // ignore non-elements, only consider selector-matching elements
                 // handle both the index and no-index (selector-only) cases
                 if (isElement(el)
-                    && (!filterFn || (filterFn === true || filterFn(el, elind)))
+                    && (!filterFn || filterFn === true || filterFn(el, elind))
                     && selectorMatches(selector, el)
                     && (index === null || i-- === 0)) {
                   // this concat vs push is to make sure we add elements to the result array
@@ -334,10 +334,11 @@
               // perhaps it's an selector(x).is(y) type selector?
               ss = s('a', e)
               _selectorMatches =
-                isFunction(ss.matching) ? function (selector, el) { return s(el).matching(selector).length > 0 } :
-                  isFunction(ss.is) ? function (selector, el) { return s(el).is(selector) } :
-                    isFunction(ss.matchesSelector) ? function (selector, el) { return s(el).matchesSelector(selector) } :
-                      isFunction(ss.match) ? function (selector, el) { return s(el).match(selector) } : null
+                isFunction(ss._is) ? function (selector, el) { return s(el)._is(selector) } : // original .is(), replaced by Enderbridge
+                  isFunction(ss.matching) ? function (selector, el) { return s(el).matching(selector).length > 0 } :
+                    isFunction(ss.is) && !ss.is.__ignore ? function (selector, el) { return s(el).is(selector) } :
+                      isFunction(ss.matchesSelector) ? function (selector, el) { return s(el).matchesSelector(selector) } :
+                        isFunction(ss.match) ? function (selector, el) { return s(el).match(selector) } : null
             }
 
             if (!_selectorMatches)

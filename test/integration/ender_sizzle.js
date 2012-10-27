@@ -2,7 +2,7 @@
   * =============================================================
   * Ender: open module JavaScript framework (https://ender.no.de)
   * Build: ender build domready sizzle bonzo ../.. --output ender_sizzle
-  * Packages: ender-js@0.4.4 domready@0.2.11 sizzle@1.1.0 bonzo@1.2.3 traversty@0.0.7
+  * Packages: ender-js@0.4.4 domready@0.2.11 sizzle@1.1.0 bonzo@1.2.4 traversty@0.0.7
   * =============================================================
   */
 
@@ -2584,7 +2584,8 @@
       , dim: function () {
           if (!this.length) return { height: 0, width: 0 }
           var el = this[0]
-            , orig = !el.offsetWidth && !el.offsetHeight ?
+            , de = el.nodeType == 9 && el.documentElement // document
+            , orig = !de && !!el.style && !el.offsetWidth && !el.offsetHeight ?
                // el isn't visible, can't be measured properly, so fix that
                function (t) {
                  var s = {
@@ -2599,8 +2600,12 @@
                  })
                  return s
               }(this) : null
-            , width = el.offsetWidth
-            , height = el.offsetHeight
+            , width = de
+                ? Math.max(el.body.scrollWidth, el.body.offsetWidth, de.scrollWidth, de.offsetWidth, de.clientWidth)
+                : el.offsetWidth
+            , height = de
+                ? Math.max(el.body.scrollHeight, el.body.offsetHeight, de.scrollWidth, de.offsetWidth, de.clientHeight)
+                : el.offsetHeight
 
           orig && this.first().css(orig)
           return {
@@ -3338,6 +3343,7 @@
                 ))
               }
           }
+          T.prototype.prev = T.prototype.previous
 
           function t(els) {
             return new T(isString(els) ? selectorFind(els, doc) : els)
@@ -3363,10 +3369,11 @@
                 // perhaps it's an selector(x).is(y) type selector?
                 ss = s('a', e)
                 _selectorMatches =
-                  isFunction(ss.matching) ? function (selector, el) { return s(el).matching(selector).length > 0 } :
-                    isFunction(ss.is) ? function (selector, el) { return s(el).is(selector) } :
-                      isFunction(ss.matchesSelector) ? function (selector, el) { return s(el).matchesSelector(selector) } :
-                        isFunction(ss.match) ? function (selector, el) { return s(el).match(selector) } : null
+                  isFunction(ss._is) ? function (selector, el) { return s(el)._is(selector) } : // original .is(), replaced by Enderbridge
+                    isFunction(ss.matching) ? function (selector, el) { return s(el).matching(selector).length > 0 } :
+                      isFunction(ss.is) && !ss.is.__ignore ? function (selector, el) { return s(el).is(selector) } :
+                        isFunction(ss.matchesSelector) ? function (selector, el) { return s(el).matchesSelector(selector) } :
+                          isFunction(ss.match) ? function (selector, el) { return s(el).match(selector) } : null
               }
 
               if (!_selectorMatches)
@@ -3422,15 +3429,25 @@
                 } catch (ex) { } // ignore exception, we may have an ender build with no selector engine
                 integrated = true
               }
-              fn = function (self, selector, index) { return $(t(self)[meth](selector, index)) }
+              fn = meth == 'is'
+                ? function (self, slfn) {
+                    return t(self)[meth](slfn) // boolean
+                  }
+                : function (self, selector, index) {
+                    return $(t(self)[meth](selector, index)) // collection
+                  }
               return fn(self, selector, index)
             }
           return function (selector, index) { return fn(this, selector, index) }
         }
-      , methods = 'up down next previous parents closest siblings children first last eq slice filter not is has'.split(' ')
+      , methods = 'up down next previous prev parents closest siblings children first last eq slice filter not is has'.split(' ')
       , b = {}, i = methods.length
 
+    // does this build have an .is()? if so, shift it to _is() for traversty to use and
+    // allow us to integrate a new is(), wrapped around it
+    if ($.fn.is) $.fn._is = $.fn.is
     while (--i >= 0) b[methods[i]] = integrate(methods[i])
     $.ender(b, true)
+    $.fn.is.__ignore = true
   }(ender))
 }());

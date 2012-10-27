@@ -20,7 +20,7 @@
         .up('ul').eq(-1).css('borderLeft', 'solid 5px orange')
         .closest('#fixtures').down('li').slice(-10,-9).css('fontSize', '25px')
 
-      if ($('li').is('.c')) $.create('<div>INTEGRATION TEST ALL DONE!</div>').prependTo('#fixtures')
+      if ($('li').is('.c') === true) $.create('<div>INTEGRATION TEST ALL DONE!</div>').prependTo('#fixtures')
     })
   </script>
 </head>

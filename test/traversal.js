@@ -781,7 +781,7 @@ this.traversalTests = {
 
           assert.hasExactElements(
               T(Q('#fixtures > ul')).children()
-            , '#fixtures > ul > li,'
+            , '#fixtures > ul > li'
             , 'sublings() with no-arg returns all children (multi collection, firstChildren)'
           )
         }

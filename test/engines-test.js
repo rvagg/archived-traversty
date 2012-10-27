@@ -46,8 +46,8 @@ var own = Object.prototype.hasOwnProperty
 // we also don't want to run native tests in older browsers that don't support it
 if (__matchesSelector) engineTest(null, 'Native')
 engineTest(Q, 'Qwery')
-engineTest(Sizzle, 'Sizzle')
-engineTest(NW.Dom, 'NW')
+//engineTest(Sizzle, 'Sizzle')
+//engineTest(NW.Dom, 'NW')
 // Sel must be last because it requires es5-basic which extends natives and we don't
 // want that impacting any other tests in unexpected ways
-engineTest(sel, 'Sel', function() { loadES5Basic() })
+//engineTest(sel, 'Sel', function() { loadES5Basic() })

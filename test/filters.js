@@ -750,23 +750,23 @@ this.filterTests = {
 
   , 'is()': {
           'is() on empty collection': function () {
-            refute(T([]).is())
+            assert(T([]).is() === false)
           }
 
         , 'is() on multi collection': function () {
-            refute(T(Q('#fixtures > ul > li')).is())
+            assert(T(Q('#fixtures > ul > li')).is() === false)
           }
 
         , 'is(fn=false) on multi collection': function () {
-            refute(T(Q('#fixtures > ul > li')).is(function () { return false }))
+            assert(T(Q('#fixtures > ul > li')).is(function () { return false }) === false)
           }
 
         , 'is(fn=true) on multi collection': function () {
-            assert(T(Q('#fixtures > ul > li')).is(function () { return true }))
+            assert(T(Q('#fixtures > ul > li')).is(function () { return true }) === true)
           }
 
         , 'is(fn=true) on empty collection': function () {
-            refute(T([]).is(function () { return true }))
+            assert(T([]).is(function () { return true }) === false)
           }
    
        , 'is(fn) `this` and arguments check': function () {
@@ -784,21 +784,21 @@ this.filterTests = {
           }
 
         , 'is(nonmatch selector) on multi collection': function () {
-            refute(T(Q('#fixtures > ul > li')).is('ul'))
+            assert(T(Q('#fixtures > ul > li')).is('ul') === false)
           }
 
         , 'is(selector) on multi collection': function () {
-            assert(T(Q('#fixtures > ul > li')).is('li'))
+            assert(T(Q('#fixtures > ul > li')).is('li') === true)
           }
 
         , 'is(nonmatch element) on multi collection': function () {
-            refute(T(Q('#fixtures > ul > li')).is(Q('#fixtures')[0]))
+            assert(T(Q('#fixtures > ul > li')).is(Q('#fixtures')[0]) === false)
           }
 
         , 'is(element) on multi collection': function () {
-            assert(T(Q('#fixtures > ul > li')).is(Q('#fixtures > ul > li')[0]))
-            assert(T(Q('#fixtures > ul > li')).is(Q('#fixtures > ul > li')[2]))
-            assert(T(Q('#fixtures > ul > li')).is(Q('#fixtures > ul > li')[6]))
+            assert(T(Q('#fixtures > ul > li')).is(Q('#fixtures > ul > li')[0]) === true)
+            assert(T(Q('#fixtures > ul > li')).is(Q('#fixtures > ul > li')[2]) === true)
+            assert(T(Q('#fixtures > ul > li')).is(Q('#fixtures > ul > li')[6]) === true)
           }
     }
 }
