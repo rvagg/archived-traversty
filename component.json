@@ -1,0 +1,13 @@
+{
+  "name": "traversty",
+  "repo": "rvagg/traversty",
+  "description": "Library agnostic utility for traversing the DOM.",
+  "version": "0.0.7",
+  "keywords": ["dom", "nodes"],
+  "dependencies": {},
+  "development": {},
+  "main": "traversty.js",
+  "scripts": [
+    "traversty.js"
+  ]
+}

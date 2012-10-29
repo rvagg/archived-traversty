@@ -7,6 +7,10 @@ Inspired by [Prototype](http://prototypejs.org)'s excelent "DOM traversal toolki
 
 Traversty is designed primarily to be integrated in an [Ender](http://ender.no.de/) build, to augment what's already available in [Bonzo](https://github.com/ded/bonzo) but can just as easily be used as a stand-alone utility. 
 
+You can also install Traversty as a [component](https://github.com/component/component):
+
+    $ component install rvagg/traversty
+
 Example usage
 -------------
 
