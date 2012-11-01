@@ -2,7 +2,7 @@
   * =============================================================
   * Ender: open module JavaScript framework (https://ender.no.de)
   * Build: ender build domready qwery bonzo ../.. --output ender_qwery
-  * Packages: ender-js@0.4.4 domready@0.2.11 qwery@3.3.11 bonzo@1.2.4 traversty@0.0.7
+  * Packages: ender-js@0.4.4 domready@0.2.11 qwery@3.3.11 bonzo@1.2.7-1 traversty@1.0.0
   * =============================================================
   */
 
@@ -1424,7 +1424,11 @@
          * @return {Bonzo|number}
          */
       , offset: function (opt_x, opt_y) {
-          if (typeof opt_x == 'number' || typeof opt_y == 'number') {
+          if (opt_x && typeof opt_x == 'object' && (typeof opt_x.top == 'number' || typeof opt_x.left == 'number')) {
+            return this.each(function (el) {
+              xy(el, opt_x.left, opt_x.top)
+            })
+          } else if (typeof opt_x == 'number' || typeof opt_y == 'number') {
             return this.each(function (el) {
               xy(el, opt_x, opt_y)
             })
@@ -1436,19 +1440,13 @@
             , width: 0
           }
           var el = this[0]
+            , de = el.ownerDocument.documentElement
+            , bcr = el.getBoundingClientRect()
+            , scroll = getWindowScroll()
             , width = el.offsetWidth
             , height = el.offsetHeight
-            , top = el.offsetTop
-            , left = el.offsetLeft
-          while (el = el.offsetParent) {
-            top = top + el.offsetTop
-            left = left + el.offsetLeft
-
-            if (el != doc.body) {
-              top -= el.scrollTop
-              left -= el.scrollLeft
-            }
-          }
+            , top = bcr.top + scroll.y - Math.max(0, de && de.clientTop, doc.body.clientTop)
+            , left = bcr.left + scroll.x - Math.max(0, de && de.clientLeft, doc.body.clientLeft)
 
           return {
               top: top
@@ -1576,10 +1574,7 @@
          */
       , remove: function () {
           this.deepEach(clearData)
-
-          return this.each(function (el) {
-            el[parentNode] && el[parentNode].removeChild(el)
-          })
+          return this.detach()
         }
 
 
@@ -1602,7 +1597,7 @@
          */
       , detach: function () {
           return this.each(function (el) {
-            el[parentNode].removeChild(el)
+            el[parentNode] && el[parentNode].removeChild(el)
           })
         }
 
@@ -1931,12 +1926,15 @@
       , doc = window.document
       , html = doc.documentElement
       , toString = Object.prototype.toString
-      , slice = Array.prototype.slice
+      , Ap = Array.prototype
+      , slice = Ap.slice
         // feature test to find native matchesSelector()
       , matchesSelector = (function (el, pfx, name, i, ms) {
           while (i < pfx.length)
             if (el[ms = pfx[i++] + name]) return ms
         }(html, [ 'msM', 'webkitM', 'mozM', 'oM', 'm' ], 'atchesSelector', 0))
+
+      , Kfalse = function () { return false }
 
       , isNumber = function (o) {
           return toString.call(o) === '[object Number]'
@@ -2053,7 +2051,7 @@
                   // ignore non-elements, only consider selector-matching elements
                   // handle both the index and no-index (selector-only) cases
                   if (isElement(el)
-                      && (!filterFn || (filterFn === true || filterFn(el, elind)))
+                      && (!filterFn || filterFn === true || filterFn(el, elind))
                       && selectorMatches(selector, el)
                       && (index === null || i-- === 0)) {
                     // this concat vs push is to make sure we add elements to the result array
@@ -2092,7 +2090,7 @@
               ? function (el, i) { return slfn.call(el, i) }
               : to == 'string' && slfn.length
                 ? function (el) { return selectorMatches(slfn, el) }
-                : function () { return false }
+                : Kfalse
         }
 
         // fn = !fn
@@ -2181,7 +2179,11 @@
               }
 
             , eq: function (index) {
-                return traversty((index = eqIndex(this.length, index, 0)) === null ? [] : this[index])
+                return traversty(this.get(index))
+              }
+
+            , get: function (index) {
+                return this[eqIndex(this.length, index, 0)]
               }
 
               // a crazy man wrote this, don't try to understand it, see the tests
@@ -2203,6 +2205,18 @@
                 return traversty(filter(this, inv(filterFn(slfn))))
               }
 
+              // similar to filter() but cares about descendent elements
+            , has: function (slel) {
+                return traversty(filter(
+                    this
+                  , isElement(slel)
+                      ? function (el) { return isAncestor(slel, el) }
+                      : typeof slel == 'string' && slel.length
+                        ? function (el) { return selectorFind(slel, el).length } //TODO: performance
+                        : Kfalse
+                ))
+              }
+
               // same as filter() but return a boolean so quick-return after first successful find
             , is: function (slfn) {
                 var i = 0, l = this.length
@@ -2212,23 +2226,40 @@
                 return false
               }
 
-              // similar to filter() but cares about descendent elements
-            , has: function (slel) {
-                return traversty(filter(
-                    this
-                  , isElement(slel)
-                      ? function (el) { return isAncestor(slel, el) }
-                      : typeof slel == 'string' && slel.length
-                        ? function (el) { return selectorFind(slel, el).length } //TODO: performance
-                        : function () { return false }
-                ))
+            , toArray: function () { return Ap.slice.call(this) }
+
+            , size: function () { return this.length }
+
+            , each: function (fn, ctx) {
+                var i = 0, l = this.length
+                for (; i < l; i++)
+                  fn.call(ctx || this[i], this[i], i, this)
+                return this
               }
+
+              // quack like a duck (Array)
+            , push: Ap.push
+            , sort: Ap.sort
+            , splice: Ap.splice
           }
+
           T.prototype.prev = T.prototype.previous
 
           function t(els) {
             return new T(isString(els) ? selectorFind(els, doc) : els)
           }
+
+          // extend traversty functionality with custom methods
+          t.aug = function (methods) {
+            var key, method
+            for (key in methods) {
+              method = methods[key]
+              if (typeof method == 'function') {
+                T.prototype[key] = method
+              }
+            }
+          }
+
 
           t.setSelectorEngine = function (s) {
             // feature testing the selector engine like a boss

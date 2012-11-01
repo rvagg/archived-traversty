@@ -62,7 +62,7 @@
 
   <script>
     var $ = traversty
-    $.setSelectorEngine({ select: zest, is: zest.matches })
+    $.setSelectorEngine(zest)
     $('#fixtures > ul')
       .down(0).css('color', 'red')
       .next('li', 1).css('color', 'green')
