@@ -3,6 +3,7 @@
   , "repo"            : "rvagg/traversty"
   , "description"     : "Library agnostic utility for DOM collection management and traversal"
   , "version"         : "1.0.1"
+  , "twitter"         : "@rvagg"
   , "keywords"        : [
         "dom"
       , "nodes"
