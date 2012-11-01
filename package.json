@@ -1,17 +1,20 @@
 {
-    "name": "traversty"
-  , "description": "Library agnostic utility for traversing the DOM"
-  , "version": "0.0.7"
-  , "homepage": "https://github.com/rvagg/traversty"
-  , "author": "Rod Vagg <rod@vagg.org> @rvagg"
-  , "keywords": ["ender", "dom", "nodes"]
-  , "main": "./traversty.js"
-  , "ender": "./ender_bridge.js"
-  , "repository": {
-        "type": "git"
-      , "url": "https://github.com/rvagg/traversty.git"
+    "name"            : "traversty"
+  , "description"     : "Library agnostic utility for traversing the DOM"
+  , "version"         : "1.0.0"
+  , "homepage"        : "https://github.com/rvagg/traversty"
+  , "authors"         : [
+        "Rod Vagg @rvagg <rod@vagg.org> (https://github.com/rvagg)"
+    ]
+  , "keywords"        : ["ender", "dom", "nodes", "traversal"]
+  , "main"            : "./traversty.js"
+  , "ender"           : "./ender_bridge.js"
+  , "repository"      : {
+        "type"            : "git"
+      , "url"             : "https://github.com/rvagg/traversty.git"
     }
-  , "devDependencies": {
-        "buster": "*"
+  , "devDependencies" : {
+        "buster"          : "*"
     }
+  , "license"         : "MIT"
 }
