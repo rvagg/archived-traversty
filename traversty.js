@@ -1,5 +1,6 @@
-/**************************************************************
-  * Traversty: DOM Traversal Utility (c) Rod Vagg (@rvagg) 2012
+/***************************************************************
+  * Traversty: A DOM collection management and traversal utility
+  * (c) Rod Vagg (@rvagg) 2012
   * https://github.com/rvagg/traversty
   * License: MIT
   */
