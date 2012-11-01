@@ -47,34 +47,34 @@ The return type from the `traversty()` method is not a true `Array` but can be u
 <a href="#api"></a>
 ## API
 
-  * <a href="#ctor"><code>**traversty()**</code></a>
-  * <a href="#next"><code>traversty().**next()**</code></a>
-  * <a href="#previous"><code>traversty().**previous()**</code></a>
-  * <a href="#previous"><code>traversty().**prev()**</code></a>
-  * <a href="#up"><code>traversty().**up()**</code></a>
-  * <a href="#parents"><code>traversty().**parents()**</code></a>
-  * <a href="#closest"><code>traversty().**closest()**</code></a>
-  * <a href="#down"><code>traversty().**down()**</code></a>
-  * <a href="#siblings"><code>traversty().**siblings()**</code></a>
-  * <a href="#children"><code>traversty().**children()**</code></a>
-  * <a href="#first"><code>traversty().**first()**</code></a>
-  * <a href="#last"><code>traversty().**last()**</code></a>
-  * <a href="#eq"><code>traversty().**eq()**</code></a>
-  * <a href="#slice"><code>traversty().**slice()**</code></a>
-  * <a href="#filter"><code>traversty().**filter()**</code></a>
-  * <a href="#not"><code>traversty().**not()**</code></a>
-  * <a href="#has"><code>traversty().**has()**</code></a>
-  * <a href="#is"><code>traversty().**is()**</code></a>
-  * <a href="#get"><code>traversty().**get()**</code></a>
-  * <a href="#each"><code>traversty().**each()**</code></a>
-  * <a href="#toArray"><code>traversty().**toArray()**</code></a>
-  * <a href="#size"><code>traversty().**size()**</code></a>
-  * <a href="#push"><code>traversty().**push()**</code></a>
-  * <a href="#sort"><code>traversty().**sort()**</code></a>
-  * <a href="#splice"><code>traversty().**splice()**</code></a>
-  * <a href="#aug"><code>traversty.**aug()**</code></a>
-  * <a href="#setSelectorEngine"><code>traversty.**setSelectorEngine()**</code></a>
-  * <a href="#noConflict"><code>traversty.**noConflict()**</code></a>
+  * <a href="#ctor"><code><b>traversty()</b></code></a>
+  * <a href="#next"><code>traversty().<b>next()</b></code></a>
+  * <a href="#previous"><code>traversty().<b>previous()</b></code></a>
+  * <a href="#previous"><code>traversty().<b>prev()</b></code></a>
+  * <a href="#up"><code>traversty().<b>up()</b></code></a>
+  * <a href="#parents"><code>traversty().<b>parents()</b></code></a>
+  * <a href="#closest"><code>traversty().<b>closest()</b></code></a>
+  * <a href="#down"><code>traversty().<b>down()</b></code></a>
+  * <a href="#children"><code>traversty().<b>children()</b></code></a>
+  * <a href="#siblings"><code>traversty().<b>siblings()</b></code></a>
+  * <a href="#first"><code>traversty().<b>first()</b></code></a>
+  * <a href="#last"><code>traversty().<b>last()</b></code></a>
+  * <a href="#eq"><code>traversty().<b>eq()</b></code></a>
+  * <a href="#slice"><code>traversty().<b>slice()</b></code></a>
+  * <a href="#filter"><code>traversty().<b>filter()</b></code></a>
+  * <a href="#not"><code>traversty().<b>not()</b></code></a>
+  * <a href="#has"><code>traversty().<b>has()</b></code></a>
+  * <a href="#is"><code>traversty().<b>is()</b></code></a>
+  * <a href="#get"><code>traversty().<b>get()</b></code></a>
+  * <a href="#each"><code>traversty().<b>each()</b></code></a>
+  * <a href="#toArray"><code>traversty().<b>toArray()</b></code></a>
+  * <a href="#size"><code>traversty().<b>size()</b></code></a>
+  * <a href="#push"><code>traversty().<b>push()</b></code></a>
+  * <a href="#sort"><code>traversty().<b>sort()</b></code></a>
+  * <a href="#splice"><code>traversty().<b>splice()</b></code></a>
+  * <a href="#aug"><code>traversty.<b>aug()</b></code></a>
+  * <a href="#setSelectorEngine"><code>traversty.<b>setSelectorEngine()</b></code></a>
+  * <a href="#noConflict"><code>traversty.<b>noConflict()</b></code></a>
 
 --------------------------------------------------------
 <a name="ctor"></a>
@@ -231,29 +231,6 @@ traversty('#root').down('li', 5)
 
 Of course `down()` works on multiple elements simultaneously just like the other methods.
 
---------------------------------------------------------
-<a name="siblings"></a>
-### siblings([selector [, index = 0]])
-<code>traversty(elements).siblings()</code> returns a new Traversty instance containing *previousSibling* and *nextSibling* elements according to the arguments provided. It's important to note that the resulting collection **will not** include the original elements unless they are siblings of each other. To illustrate:
-
-```html
-<ul id="root">
-  <li>first</li>
-  <li>second</li>
-  <li>third</li>
-  <li>fourth</li>
-</ul>
-```
-
-```js
-traversty('#root :nth-child(2)').siblings()
-  // →  will give you all `<li>` elements except the second
-traversty('#root :nth-child(2n)').siblings()
-  // →  will give you all `<li>` elements because they are all siblings of
-  //    the original collection's elements
-```
-
-`siblings()` is the only method in Traversty that is not guaranteed to return a collection of elements in document-order (i.e. in the order they appear in the HTML). If you call `siblings()` on elements that are already siblings then the collection mechanism may mean that the results are out of order. Generally this shouldn't matter but you are warned if order matters to you for some reason.
 
 --------------------------------------------------------
 <a name="children"></a>
@@ -287,6 +264,31 @@ traversty('#root > li').children().children()
   // →  will give you *only* the second level `<li>` elements and none
   //    of their children
 ```
+
+--------------------------------------------------------
+<a name="siblings"></a>
+### siblings([selector [, index = 0]])
+<code>traversty(elements).siblings()</code> returns a new Traversty instance containing *previousSibling* and *nextSibling* elements according to the arguments provided. It's important to note that the resulting collection **will not** include the original elements unless they are siblings of each other. To illustrate:
+
+```html
+<ul id="root">
+  <li>first</li>
+  <li>second</li>
+  <li>third</li>
+  <li>fourth</li>
+</ul>
+```
+
+```js
+traversty('#root :nth-child(2)').siblings()
+  // →  will give you all `<li>` elements except the second
+traversty('#root :nth-child(2n)').siblings()
+  // →  will give you all `<li>` elements because they are all siblings of
+  //    the original collection's elements
+```
+
+`siblings()` is the only method in Traversty that is not guaranteed to return a collection of elements in document-order (i.e. in the order they appear in the HTML). If you call `siblings()` on elements that are already siblings then the collection mechanism may mean that the results are out of order. Generally this shouldn't matter but you are warned if order matters to you for some reason.
+
 
 --------------------------------------------------------
 <a name="first"></a>
