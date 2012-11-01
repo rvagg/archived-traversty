@@ -18,6 +18,16 @@ Traversty emulates an Array and includes additional methods to help you manage i
 
 Traversty is designed to be integrated in an [Ender](http://ender.no.de/) build, to augment what's already available in [Bonzo](https://github.com/ded/bonzo) but can just as easily be used as a stand-alone utility.
 
+```
+$ ender build jeesh traversty
+```
+
+You can also install Traversty as a [component](https://github.com/component/component):
+
+```
+$ component install rvagg/traversty
+```
+
 ## Example usage
 
 This bit of crazyness comes from Traversty's integration tests. The bulk of this code is used to test Traversty's integration with Ender where the `css()` method is provided by [Bonzo](https://github.com/ded/bonzo) but there is also a [vanilla version](https://github.com/rvagg/traversty/blob/master/test/integration/traversty_css_qwery.html) with only [Qwery](https://github.com/ded/qwery) for the selector engine and a `css()` method added using Traversty's <a href="#aug"><code>aug()</code></a> method (see the [/examples/aug-css.js](https://github.com/rvagg/traversty/blob/master/examples/aug-css.js) file for how this is done).

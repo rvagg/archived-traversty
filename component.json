@@ -1,0 +1,20 @@
+{
+    "name"            : "traversty"
+  , "repo"            : "rvagg/traversty"
+  , "description"     : "Library agnostic utility for DOM collection management and traversal"
+  , "version"         : "1.0.1"
+  , "keywords"        : [
+        "dom"
+      , "nodes"
+      , "traversal"
+      , "filter"
+    ]
+  , "dependencies"    : {}
+  , "development"     : {}
+  , "main"            : "index.js"
+  , "scripts": [
+        "index.js"
+      , "traversty.js"
+    ]
+  , "license"         : "MIT"
+}
