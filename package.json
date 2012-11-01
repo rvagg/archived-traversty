@@ -1,6 +1,6 @@
 {
     "name"            : "traversty"
-  , "description"     : "Library agnostic utility for traversing the DOM"
+  , "description"     : "Library agnostic utility for DOM collection management and traversal"
   , "version"         : "1.0.0"
   , "homepage"        : "https://github.com/rvagg/traversty"
   , "authors"         : [

@@ -1,4 +1,4 @@
-# Traversty &mdash; headache-free DOM traversal
+# Traversty &mdash; headache-free DOM collection management and traversal
 
 Traversty is a library-agnostic DOM utility for traversal and element collection manipulation. Traversty doesn't provide any DOM manipulation features, instead, Traversty is used for managing collections of DOM elements and navigating the DOM.
 
