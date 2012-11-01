@@ -515,7 +515,7 @@ Traversty should work out-of-the-box on modern browsers as it leverages native `
 
 Unfortunately, this doesn't work with older browsers, particularly IE8 and below. While IE8 has a CSS2-compliant `querySelectorAll()`, it doesn't have a `matchesSelector()` which Traversty makes heavy use of.
 
-Traversty allows you to plug in your favourite selector engine so it can work on whatever browsers your engine supports. Traversty is tested to support [Qwery](https://github.com/ded/qwery), [Sel](https://github.com/amccollum/sel), [Sizzle](https://github.com/jquery/sizzle) and [NWMatcher](https://github.com/dperini/nwmatcher).
+Traversty allows you to plug in your favourite selector engine so it can work on whatever browsers your engine supports. Traversty is tested to support [Qwery](https://github.com/ded/qwery), [Sel](https://github.com/amccollum/sel), [Sizzle](https://github.com/jquery/sizzle), [NWMatcher](https://github.com/dperini/nwmatcher) and [Zest](https://github.com/chjj/zest).
 
 Traversty uses *feature detection* to figure out how to use your selector engine, it tries to find the method used to *find* elements given a element root and the method used to determine if an element *matches* a given selector. If it can't figure out how to use your selector engine then you just need to pretend that it works like one of the supported ones and it should be OK.
 
@@ -539,10 +539,17 @@ If you have a new selector engine that you want Traversty to support then either
 
 ## I want a demo!
 
-You'll have to make do with the integration tests. [Here](http://rvagg.github.com/traversty/test/integration/ender_qwery.html) is Traversty running in an Ender build with Qwery and Bonzo. You can also see it running with [Sel](http://rvagg.github.com/traversty/test/integration/ender_sel.html), [Sizzle](http://rvagg.github.com/traversty/test/integration/ender_sizzle.html), [NWMatcher](http://rvagg.github.com/traversty/test/integration/ender_nwmatcher.html) and [without a selector engine](http://rvagg.github.com/traversty/test/integration/ender_sel.html) (works in modern browsers, including IE9+).
+You'll have to make do with the integration tests:
+
+### Ender
+
+[Here](http://rvagg.github.com/traversty/test/integration/ender_qwery.html) is Traversty running in an Ender build with Qwery and Bonzo. You can also see it running with [Sel](http://rvagg.github.com/traversty/test/integration/ender_sel.html), [Sizzle](http://rvagg.github.com/traversty/test/integration/ender_sizzle.html), [NWMatcher](http://rvagg.github.com/traversty/test/integration/ender_nwmatcher.html) and [without a selector engine](http://rvagg.github.com/traversty/test/integration/ender_sel.html) (works in modern browsers, including IE9+).
 
 View-source to see what it's doing, note that it's operating on 2 lists at the same time.
 
+### Vanilla
+
+[Here](https://github.com/rvagg/traversty/blob/master/test/integration/traversty_css_qwery.html) is Traversty bundled with Qwery as the selector engine and the `css()` augmenting example code [/examples/aug-css.js](https://github.com/rvagg/traversty/blob/master/examples/aug-css.js) performing the same integration tests. There is also the same example using Zest instead [here](https://github.com/rvagg/traversty/blob/master/test/integration/traversty_css_zest.html)
 
 ## Things to note
 

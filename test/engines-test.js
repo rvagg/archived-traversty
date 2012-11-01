@@ -1,4 +1,4 @@
-/*global traversalTests:true, filterTests:true, buster:true, T:true, Q:true, Sizzle:true, NW:true, sel:true, loadES5Basic:true, __matchesSelector:true*/
+/*global traversalTests:true, filterTests:true, buster:true, T:true, Q:true, Sizzle:true, NW:true, zest:true, sel:true, loadES5Basic:true, __matchesSelector:true*/
 
 var own = Object.prototype.hasOwnProperty
   , extend = function (src, dst) {
@@ -44,10 +44,11 @@ var own = Object.prototype.hasOwnProperty
 
 // native must be first so we start off without T.setSelectorEngine() being called
 // we also don't want to run native tests in older browsers that don't support it
-if (__matchesSelector) engineTest(null, 'Native')
+if (window.__matchesSelector) engineTest(null, 'Native')
 engineTest(Q, 'Qwery')
 engineTest(Sizzle, 'Sizzle')
 engineTest(NW.Dom, 'NW')
+engineTest(zest, 'Zest')
 // Sel must be last because it requires es5-basic which extends natives and we don't
 // want that impacting any other tests in unexpected ways
 engineTest(sel, 'Sel', function() { loadES5Basic() })

@@ -360,22 +360,38 @@
           e.innerHTML = '<a/><i/><b/>'
           a = e.firstChild
           try {
+            // YO! I HEARD YOU LIKED NESTED TERNARY OPERATORS SO I COOKED SOME UP FOR YOU!
+            // (one day I might loop this...)
+
             // check to see how we do a matchesSelector
-            _selectorMatches =
-              isFunction(s.matching) ? function (selector, el) { return s.matching([el], selector).length > 0 } :
-                isFunction(s.is) ? function (selector, el) { return s.is(el, selector) } :
-                  isFunction(s.matchesSelector) ? function (selector, el) { return s.matchesSelector(el, selector) } :
-                    isFunction(s.match) ? function (selector, el) { return s.match(el, selector) } : null
+            _selectorMatches = isFunction(s.matching)
+              ? function (selector, el) { return s.matching([el], selector).length > 0 }
+              : isFunction(s.is)
+                ? function (selector, el) { return s.is(el, selector) }
+                : isFunction(s.matchesSelector)
+                  ? function (selector, el) { return s.matchesSelector(el, selector) }
+                  : isFunction(s.match)
+                    ? function (selector, el) { return s.match(el, selector) }
+                    : isFunction(s.matches)
+                      ? function (selector, el) { return s.matches(el, selector) }
+                      : null
 
             if (!_selectorMatches) {
               // perhaps it's an selector(x).is(y) type selector?
               ss = s('a', e)
-              _selectorMatches =
-                isFunction(ss._is) ? function (selector, el) { return s(el)._is(selector) } : // original .is(), replaced by Enderbridge
-                  isFunction(ss.matching) ? function (selector, el) { return s(el).matching(selector).length > 0 } :
-                    isFunction(ss.is) && !ss.is.__ignore ? function (selector, el) { return s(el).is(selector) } :
-                      isFunction(ss.matchesSelector) ? function (selector, el) { return s(el).matchesSelector(selector) } :
-                        isFunction(ss.match) ? function (selector, el) { return s(el).match(selector) } : null
+              _selectorMatches = isFunction(ss._is)
+                ? function (selector, el) { return s(el)._is(selector) } // original .is(), replaced by Enderbridge
+                : isFunction(ss.matching)
+                  ? function (selector, el) { return s(el).matching(selector).length > 0 }
+                  : isFunction(ss.is) && !ss.is.__ignore
+                    ? function (selector, el) { return s(el).is(selector) }
+                      : isFunction(ss.matchesSelector)
+                        ? function (selector, el) { return s(el).matchesSelector(selector) }
+                        : isFunction(ss.match)
+                          ? function (selector, el) { return s(el).match(selector) }
+                          : isFunction(ss.matches)
+                            ? function (selector, el) { return s(el).matches(selector) }
+                            : null
             }
 
             if (!_selectorMatches)

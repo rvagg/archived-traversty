@@ -7,6 +7,7 @@ config['Traversty Tests'] = {
       , './test/vendor/qwery_pseudos.js'
       , './test/vendor/sizzle.js'
       , './test/vendor/nwmatcher.js'
+      , './test/vendor/zest.js'
       , './test/vendor/es5-basic_mod.js'
       , './test/vendor/sel.js'
       , './test/noconflict.js'

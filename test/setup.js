@@ -1,6 +1,6 @@
 /*global qwery:true, traversty:true, buster:true*/
 
-this.Q = qwery.noConflict()
+this.Q = qwery
 this.T = traversty.noConflict()
 this.__matchesSelector = (function (el, pfx, name, i, ms) {
       while (i < pfx.length)
