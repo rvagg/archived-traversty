@@ -1,24 +1,8 @@
-/*!
-  * @preserve Qwery - A Blazing Fast query selector engine
-  * https://github.com/ded/qwery
-  * copyright Dustin Diaz & Jacob Thornton 2012
-  * MIT License
-  */
-
 !function () {
-  var q, pseudos, i, l, p, r, nodes, m, nthPattern = /\s*((?:\+|\-)?(\d*))n\s*((?:\+|\-)\s*\d+)?\s*/
-  if (typeof module != 'undefined' && typeof 'require' != 'undefined')
-    q = require('qwery')
-  else if (typeof qwery != 'undefined')
-    q = qwery
-  else
-    return
-
-  pseudos = q.pseudos
+  var q = qwery, pseudos = q.pseudos, i, l, p, r, nodes, m, nthPattern = /\s*((?:\+|\-)?(\d*))n\s*((?:\+|\-)\s*\d+)?\s*/
 
   function children(node, ofType) {
-    var r = []
-    nodes = node.childNodes
+    nodes = node.childNodes, r = []
 
     for (i = 0, l = nodes.length; i < l; i++) {
       if (nodes[i].nodeType == 1 && (!ofType || nodes[i].nodeName == ofType)) r.push(nodes[i])
@@ -38,8 +22,8 @@
     else if (val == 'even') return checkNthExpr(el, nodes, 2, 0)
     else if (m = nthPattern.exec(val))
       return checkNthExpr(el, nodes,
-                          (m[2] ? parseInt(m[1], 10) : parseInt(m[1] + '1', 10)),  // Check case where coefficient is omitted
-                          (m[3] ? parseInt(m[3].replace(/\s*/, ''), 10) : 0)) // Check case where constant is omitted
+                          (m[2] ? parseInt(m[1]) : parseInt(m[1] + '1')),  // Check case where coefficient is omitted
+                          (m[3] ? parseInt(m[3].replace(/\s*/, '')) : 0)) // Check case where constant is omitted
 
     return false
   }
