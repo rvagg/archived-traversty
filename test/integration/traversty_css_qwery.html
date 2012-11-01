@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+  <title>Traversty with Qwery and css() augmentation Integration Test</title>
+  <script src="../../traversty.js"></script>
+  <script src="qwery.js"></script>
+  <script src="qwery-pseudos.js"></script>
+  <script src="../../examples/aug-css.js"></script>
+</head>
+<body>
+  <h1>Traversty with Qwery and css() augmentation Integration Test</h1>
+  <p>This is vanilla Traversty with Qwery plugged in as <code>setSelectorEngine()</code> and a <code>css()</code> method added by using <code>aug()</code>. See the <i>/examples/aug-css.js</i> file for how this achieved.</p>
+
+  <div id="fixtures">
+    <ul>
+      <li>ONE (red)</li>
+      <li class="c">TWO</li>
+      <li>THREE (green)</li>
+      <li class="c">FOUR
+        <ul class="second">
+          <li>i</li>
+          <li class="c">ii</li>
+          <li>iii (blue)</li>
+          <li class="c">iv
+            <span class="c">SPAN (yellow)</span>
+          </li>
+        </ul>
+      </li>
+      <li class="c">FIVE (purple)</li>
+    </ul>
+    <ul>
+      <li>one (red)</li>
+      <li class="c">two</li>
+      <li>three (green)</li>
+      <li class="c">four
+        <ul class="second">
+          <li>1</li>
+          <li class="c">2</li>
+          <li>3 (blue)</li>
+          <li class="c">4
+            <span class="c">span (yellow)</span>
+          </li>
+        </ul>
+      </li>
+      <li class="c">five (purple)</li>
+    </ul>
+  </div>
+
+  <div id="reference">
+    <h2>Reference screenshot</h2>
+    <p>The above block should look similar to this:</p>
+    <img src="integration_reference.png" style="border: 1px solid rgb(100,100,100); box-shadow: 2px 2px 15px rgb(100,100,100);">
+  </div>
+
+  <p>See also:</p>
+  <ul>
+    <li><a href="ender_qwery.html">Traversty Ender (with Qwery) Integration Test</a></li>
+    <li><a href="ender_sel.html">Traversty Ender (with Sel) Integration Test</a></li>
+    <li><a href="ender_sizzle.html">Traversty Ender (with Sizzle) Integration Test</a></li>
+    <li><a href="ender_nwmatcher.html">Traversty Ender (with NWMatcher) Integration Test</a></li>
+    <li><a href="ender_noselector.html">Traversty Ender (with no selector engine) Integration Test</a></li>
+  </ul>
+
+  <script>
+    var $ = traversty
+    $.setSelectorEngine(qwery)
+    $('#fixtures > ul')
+      .down(0).css('color', 'red')
+      .next('li', 1).css('color', 'green')
+      .next().down('li', 2).css('color', 'blue')
+      .next().down().css('color', 'yellow')
+      .up(2).next().css('color', 'purple')
+      .siblings(3).css('fontWeight', 'bold')
+      .children().css('textDecoration', 'underline')
+      .children(1).css('borderLeft', 'solid 5px red')
+      .parents('*').filter('ul').css('borderTop', 'dashed 2px green')
+      .not('.second').css('borderBottom', 'solid 3px blue')
+      .down('.second li').has('span').css('marginTop', '10px')
+      .up('ul').eq(-1).css('borderLeft', 'solid 5px orange')
+      .closest('#fixtures').down('li').slice(-10,-9).css('fontSize', '25px')
+
+    $.aug({ prepend: function (element) {
+      return this.each(function (el, i) {
+        el.insertBefore(i > 0 ? element.cloneNode(true) : element, el.firstChild)
+      })
+    }})
+
+    var div = document.createElement('div')
+    div.innerHTML = 'INTEGRATION TEST ALL DONE!'
+    if ($('li').is('.c') === true) $('#fixtures').prepend(div)
+  </script>
+</body>
+</html>

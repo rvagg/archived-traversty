@@ -136,6 +136,88 @@ this.filterTests = {
         }
     }
 
+  , 'get()': {
+        'get(0) of many': function () {
+          assert.isExactElement(
+              T(Q('#fixtures > ul > li')).get(0)
+            , '#fixtures > ul:nth-child(1) > li:nth-child(1)'
+            , 'get(0) on a collection returns only the first element'
+          )
+        }
+
+      , 'get(2) of many': function () {
+          assert.isExactElement(
+              T(Q('#fixtures > ul > li')).get(2)
+            , '#fixtures > ul:nth-child(1) > li:nth-child(3)'
+            , 'get(2) on a collection returns only the 3rd element'
+          )
+        }
+
+      , 'get(last index) of many': function () {
+          assert.isExactElement(
+              T(Q('#fixtures > ul > li')).get(9)
+            , '#fixtures > ul:nth-child(2) > li:nth-child(5)'
+            , 'get(last index) on a collection returns only the last element'
+          )
+        }
+
+      , 'get(-1) of many': function () {
+          assert.isExactElement(
+              T(Q('#fixtures > ul > li')).get(-1)
+            , '#fixtures > ul:nth-child(2) > li:nth-child(5)'
+            , 'get(-1) on a collection returns only the last element'
+          )
+        }
+
+      , 'get(-2) of many': function () {
+          assert.isExactElement(
+              T(Q('#fixtures > ul > li')).get(-2)
+            , '#fixtures > ul:nth-child(2) > li:nth-child(4)'
+            , 'get(-2) on a collection returns only the second last element'
+          )
+        }
+
+      , 'get() of one': function () {
+          assert.isExactElement(
+              T(Q('#fixtures > ul:nth-child(1) > li:nth-child(1)')).get()
+            , '#fixtures > ul:nth-child(1) > li:nth-child(1)'
+            , 'get() on a collection of one returns the one element'
+          )
+        }
+
+      , 'get(0) of none': function () {
+          assert.isExactElement(
+              T(Q('#foobar')).get(0)
+            , '#doobar'
+            , 'get() on an empty collection returns an empty collection'
+          )
+        }
+
+      , 'get(100) of none': function () {
+          assert.isExactElement(
+              T(Q('#foobar')).get(100)
+            , '#doobar'
+            , 'get(100) on an empty collection returns an empty collection'
+          )
+        }
+
+      , 'get(100) of < 100': function () {
+          assert.isExactElement(
+              T(Q('#fixtures > ul > li')).get(100)
+            , '#doobar'
+            , 'get(100) on a collection of < 100 returns empty collection'
+          )
+        }
+
+      , 'get() of many': function () {
+          assert.isExactElement(
+              T(Q('#fixtures > ul > li')).get()
+            , '#fixtures > ul:nth-child(1) > li:nth-child(1)'
+            , 'get() on a collection returns only the first element'
+          )
+        }
+    }
+
   , 'slice()': {
         'slice(0) of many': function () {
           assert.hasExactElements(

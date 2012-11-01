@@ -26,6 +26,16 @@ buster.assertions.add("hasExactElements", {
   , assertMessage: "Expected ${actual} to be ${elements} (selector: ${1}): ${2}"
 })
 
+buster.assertions.add("isExactElement", {
+    assert: function (actual, expectedSelector) {
+      var i
+      this.element = Q(expectedSelector)[0]
+      this.actual = actual
+      return this.actual === this.element
+    }
+  , assertMessage: "Expected ${actual} to be ${element} (selector: ${1}): ${2}"
+})
+
 buster.assertions.add("hasExactElementsUnordered", {
     assert: function (actual, expectedSelector) {
       var i, j, found = 0

@@ -15,12 +15,15 @@
     , doc = window.document
     , html = doc.documentElement
     , toString = Object.prototype.toString
-    , slice = Array.prototype.slice
+    , Ap = Array.prototype
+    , slice = Ap.slice
       // feature test to find native matchesSelector()
     , matchesSelector = (function (el, pfx, name, i, ms) {
         while (i < pfx.length)
           if (el[ms = pfx[i++] + name]) return ms
       }(html, [ 'msM', 'webkitM', 'mozM', 'oM', 'm' ], 'atchesSelector', 0))
+
+    , Kfalse = function () { return false }
 
     , isNumber = function (o) {
         return toString.call(o) === '[object Number]'
@@ -176,7 +179,7 @@
             ? function (el, i) { return slfn.call(el, i) }
             : to == 'string' && slfn.length
               ? function (el) { return selectorMatches(slfn, el) }
-              : function () { return false }
+              : Kfalse
       }
 
       // fn = !fn
@@ -265,7 +268,11 @@
             }
 
           , eq: function (index) {
-              return traversty((index = eqIndex(this.length, index, 0)) === null ? [] : this[index])
+              return traversty(this.get(index))
+            }
+
+          , get: function (index) {
+              return this[eqIndex(this.length, index, 0)]
             }
 
             // a crazy man wrote this, don't try to understand it, see the tests
@@ -287,6 +294,18 @@
               return traversty(filter(this, inv(filterFn(slfn))))
             }
 
+            // similar to filter() but cares about descendent elements
+          , has: function (slel) {
+              return traversty(filter(
+                  this
+                , isElement(slel)
+                    ? function (el) { return isAncestor(slel, el) }
+                    : typeof slel == 'string' && slel.length
+                      ? function (el) { return selectorFind(slel, el).length } //TODO: performance
+                      : Kfalse
+              ))
+            }
+
             // same as filter() but return a boolean so quick-return after first successful find
           , is: function (slfn) {
               var i = 0, l = this.length
@@ -296,23 +315,40 @@
               return false
             }
 
-            // similar to filter() but cares about descendent elements
-          , has: function (slel) {
-              return traversty(filter(
-                  this
-                , isElement(slel)
-                    ? function (el) { return isAncestor(slel, el) }
-                    : typeof slel == 'string' && slel.length
-                      ? function (el) { return selectorFind(slel, el).length } //TODO: performance
-                      : function () { return false }
-              ))
+          , toArray: function () { return Ap.slice.call(this) }
+
+          , size: function () { return this.length }
+
+          , each: function (fn, ctx) {
+              var i = 0, l = this.length
+              for (; i < l; i++)
+                fn.call(ctx || this[i], this[i], i, this)
+              return this
             }
+
+            // quack like a duck (Array)
+          , push: Ap.push
+          , sort: Ap.sort
+          , splice: Ap.splice
         }
+
         T.prototype.prev = T.prototype.previous
 
         function t(els) {
           return new T(isString(els) ? selectorFind(els, doc) : els)
         }
+
+        // extend traversty functionality with custom methods
+        t.aug = function (methods) {
+          var key, method
+          for (key in methods) {
+            method = methods[key]
+            if (typeof method == 'function') {
+              T.prototype[key] = method
+            }
+          }
+        }
+
 
         t.setSelectorEngine = function (s) {
           // feature testing the selector engine like a boss
