@@ -32,7 +32,7 @@ You can also install Traversty as a [component](https://github.com/component/com
 $ component install rvagg/traversty
 ```
 
-Wiring up a selector engine is up to you in your component build. You'll need to make one-off call to `setSelectorEngine()` once you have a selector engine to inject, otherwise Traversty will simply use native `querySelectorAll()` and `matchesSelector()` if available. See the <a href="#setSelectorEngine"><code>setSelectorEngine()</code></a> for more details on how this works.
+Wiring in a selector engine is up to you in your component build. You'll need to make one-off call to `setSelectorEngine()` once you have a selector engine to inject, otherwise Traversty will simply use native `querySelectorAll()` and `matchesSelector()` if available. See the <a href="#setSelectorEngine"><code>setSelectorEngine()</code></a> for more details on how this works.
 
 ```js
 var zest = require('zest')
