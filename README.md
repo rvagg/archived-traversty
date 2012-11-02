@@ -1,6 +1,6 @@
 # Traversty &mdash; headache-free DOM collection management and traversal
 
-Traversty is a library-agnostic DOM utility for traversal and element collection manipulation. Traversty doesn't provide any DOM manipulation features, instead, Traversty is used for managing collections of DOM elements and navigating the DOM.
+Traversty is a library-agnostic DOM utility for traversal and element collection manipulation. Traversty doesn't provide any DOM manipulation features; instead, Traversty is used for managing collections of DOM elements and navigating the DOM.
 
 <a href="#api"><i>Just show me the API!</i></a>
 
@@ -41,7 +41,7 @@ var zest = require('zest')
 
 ## Example usage
 
-This bit of crazyness comes from Traversty's integration tests. The bulk of this code is used to test Traversty's integration with Ender where the `css()` method is provided by [Bonzo](https://github.com/ded/bonzo) but there is also a [vanilla version](https://github.com/rvagg/traversty/blob/master/test/integration/traversty_css_qwery.html) with only [Qwery](https://github.com/ded/qwery) for the selector engine and a `css()` method added using Traversty's <a href="#aug"><code>aug()</code></a> method (see the [/examples/aug-css.js](https://github.com/rvagg/traversty/blob/master/examples/aug-css.js) file for how this is done).
+This bit of craziness comes from Traversty's integration tests. The bulk of this code is used to test Traversty's integration with Ender where the `css()` method is provided by [Bonzo](https://github.com/ded/bonzo) but there is also a [vanilla version](https://github.com/rvagg/traversty/blob/master/test/integration/traversty_css_qwery.html) with only [Qwery](https://github.com/ded/qwery) for the selector engine and a `css()` method added using Traversty's <a href="#aug"><code>aug()</code></a> method (see the [/examples/aug-css.js](https://github.com/rvagg/traversty/blob/master/examples/aug-css.js) file for how this is done).
 
 ```js
 var $ = traversty
@@ -215,7 +215,7 @@ Performs exactly the same operation as <a href="#parents"><code>parents()</code>
 --------------------------------------------------------
 <a name="down"></a>
 ### down([selector [, index = 0]])
-<code>traversty(elements).down()</code> returns a new Traversty instance containing descendent elements according to the arguments provided.
+<code>traversty(elements).down()</code> returns a new Traversty instance containing descendant elements according to the arguments provided.
 
  * `selector` *(String)* is an optional CSS selector
  * `index` *(Number)* is an optional array-ish index argument (defaults to `0`, i.e. first match)
@@ -256,7 +256,7 @@ Of course `down()` works on multiple elements simultaneously just like the other
 --------------------------------------------------------
 <a name="children"></a>
 ### children([selector [, index = 0]])
-<code>traversty(elements).children()</code> returns a new Traversty instance containing direct descendent (child) elements according to the arguments provided.
+<code>traversty(elements).children()</code> returns a new Traversty instance containing direct descendant (child) elements according to the arguments provided.
 
 ```html
 <ul id="root">
@@ -280,7 +280,7 @@ Of course `down()` works on multiple elements simultaneously just like the other
 ```js
 traversty('#root > li').children()
   // →  will give you *only* the second level `<ul>` element as it's
-  //    the only direct descendent of the top `<li>` elements
+  //    the only direct descendant of the top `<li>` elements
 traversty('#root > li').children().children()
   // →  will give you *only* the second level `<li>` elements and none
   //    of their children
@@ -383,7 +383,7 @@ An `element` argument will return a collection containing only that DOM element 
 
 ```js
 var els = traversty('#root *')
-  // →  start off with all 12 descendent elements under #root
+  // →  start off with all 12 descendant elements under #root
 els = els.filter('li')
   // →  returns only the 8 `<li>` elements within the collection
 els = els.filter(function () { return /^i/.test(this.innerHTML) })
@@ -405,11 +405,11 @@ els = els.filter(traversty('#root ul > li')[1])
 --------------------------------------------------------
 <a name="has"></a>
 ### has(selector | element)
-<code>traversty(elements).has()</code> returns a new Traversty instance containing *only* the elements that have descendent elements that match the provided `selector` argument, or have `element` as a descendent element.
+<code>traversty(elements).has()</code> returns a new Traversty instance containing *only* the elements that have descendant elements that match the provided `selector` argument, or have `element` as a descendant element.
 
-If a `selector` string argument is provided, each element in the collection effectively has a `find(selector)`-type operation performed on it, if any matching descendent elements are found, the parent element is retained for the new collection; otherwise it is not included.
+If a `selector` string argument is provided, each element in the collection effectively has a `find(selector)`-type operation performed on it, if any matching descendant elements are found, the parent element is retained for the new collection; otherwise it is not included.
 
-If an `element` argument is provided then the only element included in the resulting collection is an ancestor of that `element`, if the `element` is not a descendent of any of the elements in the collection then the resulting collection will be empty.
+If an `element` argument is provided then the only element included in the resulting collection is an ancestor of that `element`, if the `element` is not a descendant of any of the elements in the collection then the resulting collection will be empty.
 
 ```html
 <ul id="root">
@@ -432,14 +432,14 @@ If an `element` argument is provided then the only element included in the resul
 
 ```js
 var els = traversty('#root *')
-  // →  start off with all 12 descendent elements under #root
+  // →  start off with all 12 descendant elements under #root
 els = els.has('li')
-  // →  returns a collection of 4 elements which have `<li>` descendents: the 'first' `<li>`,
+  // →  returns a collection of 4 elements which have `<li>` descendants: the 'first' `<li>`,
   //    the `<ul>` directly under it, the 'ii' `<li>` and the `<ul>` directly under that.
 els.has(traversty('#root a')[0])
   // →  we're using `traversty()` here as a simple selector to fetch the `<a>` element
   //    which we pass in to `has()`. There are two elements that have this single element
-  //    as a descendent, the 'first' `<li>` element and the `<ul>` directly under it.
+  //    as a descendant, the 'first' `<li>` element and the `<ul>` directly under it.
 ```
 
 --------------------------------------------------------
@@ -574,7 +574,7 @@ View-source to see what it's doing, note that it's operating on 2 lists at the s
 
 ## Things to note
 
- * Traversty always does a **uniqueness** check on its collection of elements so you should never end up with duplicates. If you do a `traversty('body,ul').down('li')` you would still only get a unique list of all *<li>* elements in the document.
+ * Traversty always does a **uniqueness** check on its collection of elements so you should never end up with duplicates. If you do a `traversty('body,ul').down('li')` you would still only get a unique list of all <code>&lt;li&gt;</code> elements in the document.
 
  * Traversty ignores text and comment nodes and should only ever operate on the DOM element nodes you would expect (i.e. with `.nodeType === 1`).
 
@@ -611,7 +611,8 @@ Since Buster is still in Beta, the capture-server/client is a bit buggy and can 
 
 ## Credits
 
- * Firstly, much credit should go to the awesome Prototype guys and their excellent API that I've ripped off.
+ * Firstly, much credit should go to the awesome Prototype guys and their excellent API that I initially ripped off for Traversty 0.x.
+ * Obviously, kudos goes to John Resig and the jQuery team for their traversal and filtering API that I've so shamelessly ripped off.
  * Thanks to [@ded](http://github.com/ded) and [@fat](http://github.com/fat) for Ender, particularly @ded for Bonzo, upon which Traversty is designed to build.
 
 
