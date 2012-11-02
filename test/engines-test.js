@@ -29,7 +29,8 @@ var own = Object.prototype.hasOwnProperty
             if (!performedSetUp) {
               customSetUp && customSetUp()
               try {
-                T.setSelectorEngine(engine)
+                // throwing in a 'is chainable' test here.. a bit naughty but has to be done somewhere
+                assert.same(T.setSelectorEngine(engine), T)
               } catch(e) {
                 buster.log(e)
                 throw e

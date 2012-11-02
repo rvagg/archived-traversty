@@ -395,29 +395,31 @@
             }
 
             if (!_selectorMatches)
-                throw 'Traversty: couldn\'t find selector engine\'s `matchesSelector`'
+                throw new Error('Traversty: couldn\'t find selector engine\'s `matchesSelector`')
 
             // verify that we have a working `matchesSelector`
             if (_selectorMatches('x,y', e) || !_selectorMatches('a,p', e))
-                throw 'Traversty: couldn\'t make selector engine\'s `matchesSelector` work'
+                throw new Error('Traversty: couldn\'t make selector engine\'s `matchesSelector` work')
 
             // basic select
-            if ((r = select('b,a', e)).length !== 2) throw 'Traversty: don\'t know how to use this selector engine'
+            if ((r = select('b,a', e)).length !== 2) throw new Error('Traversty: don\'t know how to use this selector engine')
             // check to see if the selector engine has given us the results in document-order
             // and if not, work around it
             _selectorFind = r[0] === a ? select : createUnorderedEngineSelectorFind(select, _selectorMatches)
             // have we done enough to get a working `selectorFind`?
             if ((r = _selectorFind('b,a', e)).length !== 2 || r[0] !== a)
-              throw 'Traversty: couldn\'t make selector engine work'
+              throw new Error('Traversty: couldn\'t make selector engine work')
 
             selectorMatches = _selectorMatches
             selectorFind = _selectorFind
           } catch (ex) {
             if (isString(ex)) throw ex
-            throw 'Traversty: error while figuring out how the selector engine works: ' + (ex.message || ex)
+            throw new Error('Traversty: error while figuring out how the selector engine works: ' + (ex.message || ex))
           } finally {
             e = null
           }
+
+          return t
         }
 
         t.noConflict = function () {
