@@ -16,16 +16,27 @@ Traversty operates on DOM element collections, jQuery-style, so it also gives yo
 
 Traversty emulates an Array and includes additional methods to help you manage it as if it were one: <a href="#get"><code>get()</code></a>, <a href="#toArray"><code>toArray()</code></a>, <a href="#size"><code>size()</code></a>, <a href="#push"><code>push()</code></a>, <a href="#sort"><code>sort()</code></a>, <a href="#splice"><code>splice()</code></a>.
 
+### Ender integration
+
 Traversty is designed to be integrated in an [Ender](http://ender.no.de/) build, to augment what's already available in [Bonzo](https://github.com/ded/bonzo) but can just as easily be used as a stand-alone utility.
 
 ```
 $ ender build jeesh traversty
 ```
 
+### Component integration
+
 You can also install Traversty as a [component](https://github.com/component/component):
 
 ```
 $ component install rvagg/traversty
+```
+
+Wiring up a selector engine is let to you in your component build. You'll need to make one-off call to `setSelectorEngine()` once you have a selector engine to inject, otherwise Traversty will simply use native `querySelectorAll()` and `matchesSelector()` if available. See the <a href="#setSelectorEngine"><code>setSelectorEngine()</code></a> for more details on how this works.
+
+```js
+var zest = require('zest')
+  , $ = require('traversty').setSelectorEngine(zest)
 ```
 
 ## Example usage
@@ -517,7 +528,7 @@ traversty('li').append(span)
 --------------------------------------------------------
 <a name="setSelectorEngine"></a>
 ### setSelectorEngine(selectorEngine)
-<code>traversty.setSelectorEngine()</code> injects a selector engine for Traversty to use. See the next section for details.
+<code>traversty.setSelectorEngine()</code> injects a selector engine for Traversty to use. See the next section for details. Returns the main `Traversty` object for chainability, e.g.: `var $ = traversty.setSelectorEngine(qwery)`.
 
 ## Selector engines
 

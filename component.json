@@ -12,10 +12,9 @@
     ]
   , "dependencies"    : {}
   , "development"     : {}
-  , "main"            : "index.js"
+  , "main"            : "./traversty.js"
   , "scripts": [
-        "index.js"
-      , "traversty.js"
+        "./traversty.js"
     ]
   , "license"         : "MIT"
 }
