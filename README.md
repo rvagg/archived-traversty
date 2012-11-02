@@ -46,7 +46,7 @@ This bit of crazyness comes from Traversty's integration tests. The bulk of this
 ```js
 var $ = traversty
 $.setSelectorEngine(qwery)
-$('#fixtures > ul') // Traversty operates on collecitons of elements
+$('#fixtures > ul') // Traversty operates on collections of elements
   .down(0).css('color', 'red')
   .next('li', 1).css('color', 'green')
   .next().down('li', 2).css('color', 'blue')
