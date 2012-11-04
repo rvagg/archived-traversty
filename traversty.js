@@ -6,9 +6,12 @@
   */
 
 !(function (name, definition) {
-  if (typeof module !== 'undefined') module.exports = definition()
-  else if (typeof define === 'function' && define.amd) define(name, definition)
-  else this[name] = definition()
+  if (typeof module !== 'undefined')
+    module.exports = definition()
+  else if (typeof define === 'function' && define.amd)
+    define(name, definition)
+  else
+    this[name] = definition()
 }('traversty', function () {
 
   var context = this
@@ -21,7 +24,8 @@
       // feature test to find native matchesSelector()
     , matchesSelector = (function (el, pfx, name, i, ms) {
         while (i < pfx.length)
-          if (el[ms = pfx[i++] + name]) return ms
+          if (el[ms = pfx[i++] + name])
+            return ms
       }(html, [ 'msM', 'webkitM', 'mozM', 'oM', 'm' ], 'atchesSelector', 0))
 
     , Kfalse = function () { return false }
@@ -76,9 +80,9 @@
         return function (selector, el) {
           if (/,/.test(selector)) {
             var ret = [], i = -1, els = el.getElementsByTagName('*')
-            while (++i < els.length) {
-              if (isElement(els[i]) && selectorMatches(selector, els[i])) ret.push(els[i])
-            }
+            while (++i < els.length)
+              if (isElement(els[i]) && selectorMatches(selector, els[i]))
+                ret.push(els[i])
             return ret
           }
           return engineSelect(selector, el)
@@ -96,7 +100,9 @@
               return container !== element && container.contains(element)
             }
           : function (element, container) { // old smelly browser
-              while (element = element.parentNode) if (element === container) return 1
+              while (element = element.parentNode)
+                if (element === container)
+                  return 1
               return 0
             }
 
@@ -112,7 +118,8 @@
               break
             }
           }
-          if (!has) a.push(ar[i])
+          if (!has)
+            a.push(ar[i])
         }
         return a
       }
@@ -123,7 +130,8 @@
         while (i < l) {
           j = 0
           l2 = (res = fn(els[i], i++)).length
-          while (j < l2) ret.push(res[j++])
+          while (j < l2)
+            ret.push(res[j++])
         }
         return ret
       }
@@ -157,8 +165,10 @@
 
       // given an index & length, return a 'fixed' index, fixes non-numbers & neative indexes
     , eqIndex = function (length, index, def) {
-        if (index < 0) index = length + index
-        if (index < 0 || index >= length) return null
+        if (index < 0)
+          index = length + index
+        if (index < 0 || index >= length)
+          return null
         return !index && index !== 0 ? def : index
       }
 
@@ -166,7 +176,8 @@
     , filter = function (els, fn) {
         var arr = [], i = 0, l = els.length
         for (; i < l; i++)
-          fn(els[i], i) && arr.push(els[i])
+          if (fn(els[i], i))
+            arr.push(els[i])
         return arr
       }
 
@@ -196,7 +207,8 @@
           if (els) {
             els = unique(!els.nodeType && !isUndefined(els.length) ? els : [ els ])
             var i = this.length = els.length
-            while (i--) this[i] = els[i]
+            while (i--)
+              this[i] = els[i]
           }
         }
 
@@ -244,10 +256,13 @@
               var self = this
                 , arr = slice.call(this, 0)
                 , i = 0, l = arr.length
+
               for (; i < l; i++) {
                 arr[i] = arr[i].parentNode.firstChild
-                while (!isElement(arr[i])) arr[i] = arr[i].nextSibling
+                while (!isElement(arr[i]))
+                  arr[i] = arr[i].nextSibling
               }
+
               if (isUndefined(selector))
                 selector = '*'
 
@@ -312,7 +327,8 @@
               var i = 0, l = this.length
                 , fn = filterFn(slfn)
               for (; i < l; i++)
-                if (fn(this[i], i)) return true
+                if (fn(this[i], i))
+                  return true
               return false
             }
 
@@ -344,9 +360,8 @@
           var key, method
           for (key in methods) {
             method = methods[key]
-            if (typeof method == 'function') {
+            if (typeof method == 'function')
               T.prototype[key] = method
-            }
           }
         }
 
@@ -380,7 +395,7 @@
               // perhaps it's an selector(x).is(y) type selector?
               ss = s('a', e)
               _selectorMatches = isFunction(ss._is)
-                ? function (selector, el) { return s(el)._is(selector) } // original .is(), replaced by Enderbridge
+                ? function (selector, el) { return s(el)._is(selector) } // original .is(), replaced by Ender bridge
                 : isFunction(ss.matching)
                   ? function (selector, el) { return s(el).matching(selector).length > 0 }
                   : isFunction(ss.is) && !ss.is.__ignore
@@ -402,10 +417,13 @@
                 throw new Error('Traversty: couldn\'t make selector engine\'s `matchesSelector` work')
 
             // basic select
-            if ((r = select('b,a', e)).length !== 2) throw new Error('Traversty: don\'t know how to use this selector engine')
+            if ((r = select('b,a', e)).length !== 2)
+              throw new Error('Traversty: don\'t know how to use this selector engine')
+
             // check to see if the selector engine has given us the results in document-order
             // and if not, work around it
             _selectorFind = r[0] === a ? select : createUnorderedEngineSelectorFind(select, _selectorMatches)
+
             // have we done enough to get a working `selectorFind`?
             if ((r = _selectorFind('b,a', e)).length !== 2 || r[0] !== a)
               throw new Error('Traversty: couldn\'t make selector engine work')
@@ -413,8 +431,9 @@
             selectorMatches = _selectorMatches
             selectorFind = _selectorFind
           } catch (ex) {
-            if (isString(ex)) throw ex
-            throw new Error('Traversty: error while figuring out how the selector engine works: ' + (ex.message || ex))
+            throw isString(ex)
+              ? ex
+              : new Error('Traversty: error while figuring out how the selector engine works: ' + (ex.message || ex))
           } finally {
             e = null
           }

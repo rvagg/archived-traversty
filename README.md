@@ -2,7 +2,7 @@
 
 Traversty is a library-agnostic DOM utility for traversal and element collection manipulation. Traversty doesn't provide any DOM manipulation features; instead, Traversty is used for managing collections of DOM elements and navigating the DOM.
 
-**Current file size:** 15.5 kB raw, 5.7 kB min, **2.1 kB gzip**
+**Current file size:** 15.7 kB raw, 5.7 kB min, **2.1 kB gzip**
 
 <a href="#api"><i>Just show me the API!</i></a>
 
