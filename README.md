@@ -129,11 +129,11 @@ If just a `selector` is provided then no `index` will be assumed, you'll get **a
 #### Examples ####
 
 ```js
-traversty('li:first-child').next();
+traversty('li:first-child').next()
   // →  returns the second `<li>` of every list in the document
-traversty('li.allstarts').next('li', 1);
+traversty('li.allstarts').next('li', 1)
   // →  returns the `nextSibling` of the `nextSibling` of the starting elements
-traversty('li:first-child').next('li');
+traversty('li:first-child').next('li')
   // →  returns all `<li>` elements, except for the first-children of every lits in the document
 ```
 
@@ -150,11 +150,11 @@ Exactly the same as <a href="#next"><code>next()</code></a> except it works on *
 #### Examples ####
 
 ```js
-traversty('li:nth-child(20)').previous();
+traversty('li:nth-child(20)').previous()
   // →  returns 19th child of the every list in the document (where it exists)
-traversty('li.allstarts').previous('li', 1);
+traversty('li.allstarts').previous('li', 1)
   // →  returns the `previousSibling` of the `previousSibling` of the starting element
-traversty('li:nth-child(20)').previous('.interesting');
+traversty('li:nth-child(20)').previous('.interesting')
   // →  returns all `<li>` elements with class "interesting" up to the 19th child of every list
   //     in the document where there are at least 20 children.
 ```
@@ -183,11 +183,11 @@ If just a `selector` is provided then no `index` will be assumed, you'll get **a
 #### Examples ####
 
 ```js
-traversty('li#start').up();
+traversty('li#start').up()
   // →  returns the `<ul>` parent element
-traversty('li.allstarts').up('ul', 1);
+traversty('li.allstarts').up('ul', 1)
   // →  returns the grandparent `<ul>` elements if the start elements are nested at two levels
-traversty('li.allstarts').up('ul');
+traversty('li.allstarts').up('ul')
   // →  returns all ancestor `<ul>` elements, no matter how deep the nesting
 ```
 
@@ -547,12 +547,12 @@ For example:
 ```js
 traversty.setSelectorEngine({
     select: function(selector, root) {
-      return MyEngine(selector, root);
+      return MyEngine(selector, root)
     }
   , is: function(selector, root) {
-      return MyEngine(root).isTheSameAs(selector);
+      return MyEngine(root).isTheSameAs(selector)
     }
-});
+})
 ```
 
 Traversty will also do some trickery to make up for deficiencies in some selector engines, such as out-of-order results when selecting on groups ('a,b').
