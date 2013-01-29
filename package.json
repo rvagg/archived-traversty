@@ -1,7 +1,7 @@
 {
     "name"            : "traversty"
   , "description"     : "Library agnostic utility for DOM collection management and traversal"
-  , "version"         : "1.0.2"
+  , "version"         : "1.0.3"
   , "homepage"        : "https://github.com/rvagg/traversty"
   , "authors"         : [
         "Rod Vagg @rvagg <rod@vagg.org> (https://github.com/rvagg)"
