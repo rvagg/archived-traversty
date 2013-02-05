@@ -1,4 +1,4 @@
-/*global qwery:true, traversty:true, buster:true*/
+/*global qwery:true, traversty:true, buster:true, Q:true*/
 
 this.Q = qwery
 this.T = traversty.noConflict()
@@ -14,7 +14,13 @@ this.__matchesSelector = (function (el, pfx, name, i, ms) {
 buster.assertions.add("hasExactElements", {
     assert: function (actual, expectedSelector) {
       var i
-      this.elements = Q(expectedSelector)
+      if (typeof expectedSelector == 'string') {
+        this.elements = Q(expectedSelector)
+      } else {
+        this.elements = []
+        for (i = 0; i < expectedSelector.length; i++)
+          this.elements = this.elements.concat(Q(expectedSelector[i]))
+      }
       this.actual = []
       for (i = 0; i < actual.length; i++)
         this.actual.push(actual[i])

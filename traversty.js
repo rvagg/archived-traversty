@@ -6,9 +6,12 @@
   */
 
 (function (name, context, definition) {
-  if (typeof module != 'undefined' && module.exports) module.exports = definition()
-  else if (typeof define == 'function' && define.amd) define(definition)
-  else context[name] = definition()
+  if (typeof module != 'undefined' && module.exports)
+    module.exports = definition()
+  else if (typeof define == 'function' && define.amd)
+    define(definition)
+  else
+    context[name] = definition()
 })('traversty', this, function () {
 
   var context = this
@@ -151,7 +154,11 @@
                     && (index === null || i-- === 0)) {
                   // this concat vs push is to make sure we add elements to the result array
                   // in reverse order when doing a previous(selector) and up(selector)
-                  index === null && method !== 'nextSibling' ? ret = [el].concat(ret) : ret.push(el)
+                  index === null
+                      && method != 'nextSibling'
+                      && method != 'parentNode'
+                    ? ret.unshift(el)
+                    : ret.push(el)
                 }
                 el = el[method]
               }
