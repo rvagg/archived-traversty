@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var fs = require('fs')
   , gz = require('zlib').gzip
   , colorsTmpl = require('colors-tmpl')
@@ -22,6 +24,17 @@ var fs = require('fs')
   , s2s = function (size) {
       size = Math.round(size / 1024 * 10) / 10;
       return size + ' kB'
+    }
+
+  , packageJSON = require('./package')
+  , componentJSON = {
+        name        : packageJSON.name
+      , description : packageJSON.description
+      , version     : packageJSON.version
+      , keywords    : packageJSON.keywords
+      , main        : packageJSON.main
+      , scripts     : [ packageJSON.main ]
+      , repo        : packageJSON.repository.url.replace(/\.git$/, '')
     }
 
 sizes.min = minContents.length
@@ -54,3 +67,9 @@ gz(minContentsPrev, function (err, gzContentsPrev) {
     ))
   })
 })
+
+fs.writeFile(
+    './component.json'
+  , JSON.stringify(componentJSON, null, 2)
+  , function () {}
+)
