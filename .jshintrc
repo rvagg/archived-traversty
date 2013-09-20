@@ -7,10 +7,10 @@
   , "forin": false
   , "immed": false
   , "latedef": false
-  , "newcap": true
+  , "newcap": false
   , "noarg": true
   , "noempty": true
-  , "nonew": true
+  , "nonew": false
   , "plusplus": false
   , "quotmark": true
   , "regexp": false
@@ -18,12 +18,11 @@
   , "unused": true
   , "strict": false
   , "trailing": true
-  , "maxlen": 120
+  , "maxlen": 0
   , "asi": true
   , "boss": true
   , "debug": true
   , "eqnull": true
-  , "es5": true
   , "esnext": true
   , "evil": true
   , "expr": true

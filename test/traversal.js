@@ -1,7 +1,9 @@
-/*global Q:true, T:true, assert:true*/
-// note: `T` is `traversty` and `Q` is `qwery` (selector engine), see setup.js
+var buster = require('bustermove')
+  , assert = buster.assert
+  , Q      = require('qwery')
+  , T      = require('../traversty')
 
-this.traversalTests = {
+module.exports = {
     'Simple no-arg traversal': {
 
         'next()': function () {

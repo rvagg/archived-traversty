@@ -1,7 +1,12 @@
-/*global Q:true, T:true, traversty:true, buster:true, assert:true, __matchesSelector:true*/
+var buster = require('bustermove')
+  , assert = buster.assert
+  , Q      = require('qwery')
+  , T      = require('../traversty')
+  , setup  = require('./setup')
+
 buster.testCase('traversty', {
     'noConflict': function () {
-      assert.equals(traversty(), 'success')
+      assert.equals(window.traversty(), 'success')
       assert.isFunction(T().up)
     }
 
@@ -29,7 +34,7 @@ buster.testCase('traversty', {
   , 'traversty() can be passed selector strings': function () {
       var t
 
-      if (__matchesSelector) { // defined in setup.js
+      if (setup.__matchesSelector) { // defined in setup.js
         // T("#fixtures") has #fixtures element (only)
         assert.equals((t = T('#fixtures')).length, 1)
         assert.same(t[0], Q('#fixtures')[0])

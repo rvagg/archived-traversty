@@ -1,1 +1,1 @@
-function traversty() { return 'success' }
+window.traversty = function traversty() { return 'success' }

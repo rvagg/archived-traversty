@@ -1,17 +1,19 @@
-/*global qwery:true, traversty:true, buster:true, Q:true*/
+var buster  = require('bustermove')
+  , referee = buster.referee
+  , Q       = require('qwery')
 
-this.Q = qwery
-this.T = traversty.noConflict()
-this.__matchesSelector = (function (el, pfx, name, i, ms) {
-      while (i < pfx.length)
-        if (el[ms = pfx[i++] + name]) return ms
-      return false
-    }(document.documentElement, [ 'msM', 'webkitM', 'mozM', 'oM', 'm' ], 'atchesSelector', 0))
+require('qwery-pseudos')
+
+module.exports.__matchesSelector = (function (el, pfx, name, i, ms) {
+  while (i < pfx.length)
+    if (el[ms = pfx[i++] + name]) return ms
+  return false
+}(document.documentElement, [ 'msM', 'webkitM', 'mozM', 'oM', 'm' ], 'atchesSelector', 0))
 
 //assert.equals.message += ": ${2}";
 //assert.same.message += ": ${2}";
 
-buster.assertions.add("hasExactElements", {
+referee.add('hasExactElements', {
     assert: function (actual, expectedSelector) {
       var i
       if (typeof expectedSelector == 'string') {
@@ -29,20 +31,19 @@ buster.assertions.add("hasExactElements", {
         if (this.elements[i] !== this.actual[i]) return false
       return true
     }
-  , assertMessage: "Expected ${actual} to be ${elements} (selector: ${1}): ${2}"
+  , assertMessage: 'Expected ${actual} to be ${elements} (selector: ${1}): ${2}'
 })
 
-buster.assertions.add("isExactElement", {
+referee.add('isExactElement', {
     assert: function (actual, expectedSelector) {
-      var i
       this.element = Q(expectedSelector)[0]
       this.actual = actual
       return this.actual === this.element
     }
-  , assertMessage: "Expected ${actual} to be ${element} (selector: ${1}): ${2}"
+  , assertMessage: 'Expected ${actual} to be ${element} (selector: ${1}): ${2}'
 })
 
-buster.assertions.add("hasExactElementsUnordered", {
+referee.add('hasExactElementsUnordered', {
     assert: function (actual, expectedSelector) {
       var i, j, found = 0
       this.elements = Q(expectedSelector)
@@ -55,7 +56,7 @@ buster.assertions.add("hasExactElementsUnordered", {
           if (this.elements[i] === actual[j]) found++
       return found == actual.length
     }
-  , assertMessage: "Expected ${actual} to be ${elements} (selector: ${1}): ${2}"
+  , assertMessage: 'Expected ${actual} to be ${elements} (selector: ${1}): ${2}'
 })
 
 
