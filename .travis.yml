@@ -10,5 +10,5 @@ notifications:
 script: npm test
 env:
   global:
-  - secure: t//WDRVZFdy3ZmgOEWRyuqM1lZM6TdOn+DWvMEAzsTI38lZmCXGR9TEwCgiksVHx7Xtoc1vabS1CSNjFSSnHnWZf/hjgrPTtijXIarn48J6u09/wmDtnOGcLw9DnhuJ3QW16tsjaR+nEDtHhfwXCMtHbjC/Jo95ox6eTvJxfflE=
-  - secure: scmnKHsLClRcw3UU6v9MeYf9NPz/h8ZbijoLBD/FnAlmjZYdbESc6Xh5LU6Vu2Ny+BpZHsj6q8rHQxYcvV2O/VBrbZcemYsQNG8zEDbrusnqOALODe8P2MK7u4WOUufPVd4qoe6zLvyXhllBBahZeOshekl3MOritAHLdaOqkEk=
+  - secure: "GbzeUQwepyLYMxMxWRyu6o0qhzMIBjaPF7IxW9MIc8h7TdYd+KMBcCRObif7aOoS106cTREY8HXSDHD9GR2FTgiAI8lpTG5NDjGhl1Uy1Sn9SD96pU5+bduosOfNaLEXG/uM3AWMCP/cRt2IY1aL7y4pJOlfqaOpv2ktGgv37so="
+  - secure: "bH8tDn4SieZYS5RS51zbzgY+QSLHONZJ/oPbBvfP6eimvrMRPZgU6OpVbNL5y2OKHFJ8H7MRbyW+etOKmetOj3ok7v9hrbf5D4XhU0XGbMAsJXAM5qEn26dGrgAyDA31keZWRGJ/a4oE0m4J/5yG0RMf2AYOpE0BnqtnpLHBXGA="
