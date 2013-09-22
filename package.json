@@ -19,19 +19,11 @@
       , "qwery-pseudos"   : "*"
       , "sizzle"          : "*"
       , "nwmatcher"       : "*"
+      , "brtapsauce"      : "*"
     }
   , "license"         : "MIT"
-  , "testling"        : {
-        "files"            : "test/browserify.js"
-      , "browsers"         : {
-            "iexplore"        : [ 6, 7, 8, 9 ]
-          , "firefox"         : [ 19, "nightly" ]
-          , "chrome"          : [ 25, "canary" ]
-          , "safari"          : [ 4, 5.1, 6 ]
-          , "opera"           : [ 12, "next" ]
-          , "iphone"          : [ 6 ]
-          , "ipad"            : [ 6 ]
-          , "android-browser" : [ 4.2 ]
-        }
+  , "scripts"         : {
+        "test-local"          : "brtapsauce-local test/browserify.js"
+      , "test"                : "test/sauce.js"
     }
 }

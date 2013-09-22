@@ -1,5 +1,6 @@
 var buster         = require('bustermove')
   , assert         = buster.assert
+  , setup          = require('./setup')
   , Q              = require('qwery')
   , Sizzle         = require('sizzle')
   , NW             = require('nwmatcher')
@@ -52,7 +53,7 @@ var own = Object.prototype.hasOwnProperty
 
 // native must be first so we start off without T.setSelectorEngine() being called
 // we also don't want to run native tests in older browsers that don't support it
-if (window.__matchesSelector) engineTest(null, 'Native')
+if (setup.__matchesSelector) engineTest(null, 'Native')
 engineTest(Q, 'Qwery')
 engineTest(Sizzle, 'Sizzle')
 engineTest(NW.Dom, 'NW')
