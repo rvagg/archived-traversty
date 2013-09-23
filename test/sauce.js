@@ -6,17 +6,18 @@ const user       = process.env.SAUCE_USER
     , brtapsauce = require('brtapsauce')
 
     , capabilities = [
-          { browserName: 'chrome'            , platform: 'Windows 8' , version: ''   }
+          { browserName: 'chrome'            , platform: 'Windows XP', version: ''   }
         , { browserName: 'firefox'           , platform: 'Windows 8' , version: ''   }
+        , { browserName: 'firefox'           , platform: 'Windows XP', version: '4'  }
         , { browserName: 'internet explorer' , platform: 'Windows 8' , version: '10' }
         , { browserName: 'internet explorer' , platform: 'Windows 7' , version: '9'  }
-        /*
         , { browserName: 'internet explorer' , platform: 'Windows 7' , version: '8'  }
         , { browserName: 'internet explorer' , platform: 'Windows XP', version: '7'  }
         , { browserName: 'internet explorer' , platform: 'Windows XP', version: '6'  }
-        */
         , { browserName: 'safari'            , platform: 'Windows 7' , version: '5'  }
+        , { browserName: 'safari'            , platform: 'OS X 10.8' , version: '6'  }
         , { browserName: 'opera'             , platform: 'Windows 7' , version: ''   }
+        , { browserName: 'opera'             , platform: 'Windows 7' , version: '11' }
         , { browserName: 'ipad'              , platform: 'OS X 10.8' , version: '6'  }
         , { browserName: 'android'           , platform: 'Linux'     , version: '4.0', 'device-type': 'tablet' }
       ]
@@ -32,5 +33,5 @@ brtapsauce({
   , key          : key
   , brsrc        : path.join(__dirname, 'browserify.js')
   , capabilities : capabilities
-  , options      : { timeout: 60 * 5 }
+  , options      : { timeout: 60 * 6 }
 })
