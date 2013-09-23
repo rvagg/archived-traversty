@@ -1,6 +1,14 @@
-# Traversty &mdash; headache-free DOM collection management and traversal
+# Traversty
+
+**DOM collection management and traversal**
 
 Traversty is a library-agnostic DOM utility for traversal and element collection manipulation. Traversty doesn't provide any DOM manipulation features; instead, Traversty is used for managing collections of DOM elements and navigating the DOM.
+
+[![NPM](https://nodei.co/npm/traversty.png?compact=true)](https://nodei.co/npm/traversty/)
+
+[![Build Status](https://saucelabs.com/browser-matrix/traversty-sauce.svg)](https://travis-ci.org/rvagg/traversty)
+
+*Tests run against [Qwery](https://github.com/ded/qwery), [Sizzle](http://sizzlejs.com/), [NWMatcher](http://javascript.nwbox.com/NWMatcher/) and native `querySelectorAll()` and `matchesSelector()` where available.*
 
 **Current file size:** 15.8 kB raw, 5.7 kB min, **2.1 kB gzip**
 
