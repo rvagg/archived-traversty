@@ -12,4 +12,3 @@ env:
   global:
   - SAUCE_USER=traversty-sauce
   - secure: "J0j5e2PUKNJ19udPSwCoVIUAWyRcXt9c/crrJhLRV5XXoVYuPSTJ+qWgfb83zvejtjfC5AdY59kzfJnTaIi14y9Ciz5nitpLbAHYWdcVSmiwf9qSuqJ2S+s5aDaMfLWl3CXeqt7FGiMsb6J2OZZJzg0HKKOeMyvf6drahvDnsrA="
-
